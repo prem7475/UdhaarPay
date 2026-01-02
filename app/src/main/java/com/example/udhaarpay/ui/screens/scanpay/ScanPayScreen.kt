@@ -1,765 +1,312 @@
 package com.example.udhaarpay.ui.screens.scanpay
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.udhaarpay.data.model.BankCard
-import com.example.udhaarpay.ui.components.*
 import com.example.udhaarpay.ui.theme.*
 import com.example.udhaarpay.ui.viewmodel.ScanPayViewModel
-
-enum class ScanPayStep {
-    SCANNER,
-    PAYMENT_DETAILS,
-    ACCOUNT_SELECTION,
-    UPI_PIN,
-    CONFIRMATION
-}
 
 @Composable
 fun ScanPayScreen(
     onBack: () -> Unit,
     viewModel: ScanPayViewModel = hiltViewModel()
 ) {
-    val currentStep by viewModel.currentStep.collectAsState()
-    val qrData by viewModel.qrData.collectAsState()
-    val recipientName by viewModel.recipientName.collectAsState()
-    val recipientUPI by viewModel.recipientUPI.collectAsState()
-    val amount by viewModel.amount.collectAsState()
-    val remarks by viewModel.remarks.collectAsState()
-    val selectedAccount by viewModel.selectedAccount.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState(initial = null)
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground)
-    ) {
-        when (currentStep) {
-            ScanPayStep.SCANNER -> {
-                QRScannerStep(
-                    onQRScanned = { scannedData ->
-                        viewModel.processQRCode(scannedData)
-                    },
-                    onBack = onBack
-                )
-            }
-
-            ScanPayStep.PAYMENT_DETAILS -> {
-                PaymentDetailsStep(
-                    recipientName = recipientName,
-                    recipientUPI = recipientUPI,
-                    amount = amount,
-                    onAmountChange = { viewModel.setAmount(it) },
-                    remarks = remarks,
-                    onRemarksChange = { viewModel.setRemarks(it) },
-                    onContinue = { viewModel.moveToAccountSelection() },
-                    onBack = { viewModel.resetFlow() }
-                )
-            }
-
-            ScanPayStep.ACCOUNT_SELECTION -> {
-                AccountSelectionStep(
-                    onAccountSelected = { accountId ->
-                        viewModel.selectAccount(accountId)
-                    },
-                    onBack = { viewModel.goBackToPaymentDetails() }
-                )
-            }
-
-            ScanPayStep.UPI_PIN -> {
-                UPIPinStep(
-                    onPinSubmit = { pin ->
-                        viewModel.processPayment(pin)
-                    },
-                    onBack = { viewModel.goBackToAccountSelection() }
-                )
-            }
-
-            ScanPayStep.CONFIRMATION -> {
-                PaymentConfirmationStep(
-                    amount = amount,
-                    recipientName = recipientName,
-                    remarks = remarks,
-                    onNewTransaction = {
-                        viewModel.resetFlow()
-                    },
-                    onClose = onBack
-                )
-            }
-        }
-
-        // Global loading dialog
-        LoadingDialog(isVisible = isLoading, message = "Processing Payment...")
-
-        // Error display
-        if (error != null) {
-            Snackbar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                containerColor = ErrorRed,
-                contentColor = Color.White
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Error,
-                        contentDescription = "Error",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(text = error!!)
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        modifier = Modifier
-                            .size(16.dp)
-                            .clickable { viewModel.clearError() }
-                    )
-                }
-            }
+    val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    var upiString by remember { mutableStateOf("upi://pay?pa=merchant@upi&pn=MerchantName&mcc=1234") }
+    
+    // Display error message from ViewModel
+    LaunchedEffect(state.error) {
+        state.error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
         }
     }
-}
 
-@Composable
-fun QRScannerStep(
-    onQRScanned: (String) -> Unit,
-    onBack: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground)
-    ) {
-        PremiumTopAppBar(
-            title = "Scan QR Code",
-            onBackClick = onBack
-        )
-
-        // Camera Preview Placeholder
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp)
-                .padding(16.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(color = DarkCard),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.QrCode,
-                    contentDescription = "QR Code",
-                    tint = NeonOrange,
-                    modifier = Modifier.size(80.dp)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Position QR code in frame",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = "Automatic detection enabled",
-                    fontSize = 12.sp,
-                    color = TextSecondary,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            PremiumButton(
-                text = "Import from Gallery",
-                onClick = { },
-                backgroundColor = DarkCard,
-                textColor = NeonOrange
-            )
-
-            Text(
-                text = "Scan any UPI QR code to make payments instantly",
-                fontSize = 11.sp,
-                color = TextTertiary,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(vertical = 8.dp)
-            )
+    // Success Navigation
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) {
+            // Wait a bit to show success animation then navigate back
+            kotlinx.coroutines.delay(1500)
+            onBack()
         }
     }
-}
 
-@Composable
-fun PaymentDetailsStep(
-    recipientName: String,
-    recipientUPI: String,
-    amount: String,
-    onAmountChange: (String) -> Unit,
-    remarks: String,
-    onRemarksChange: (String) -> Unit,
-    onContinue: () -> Unit,
-    onBack: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground)
-            .verticalScroll(rememberScrollState())
-    ) {
-        PremiumTopAppBar(
-            title = "Payment Details",
-            onBackClick = onBack
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-            // Recipient Info Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = DarkCard)
-            ) {
+    Scaffold(
+        containerColor = PureBlack,
+        topBar = {
+            SmallTopAppBar(
+                title = { Text("Scan & Pay", color = White) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = White)
+                    }
+                },
+                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = PureBlack)
+            )
+        }
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            // Main Content
+            if (!state.isSuccess) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // 1. QR Scanner Simulation
+                    if (!state.isQrProcessed) {
+                        Text("Simulate QR Scan", color = Zinc400, style = MaterialTheme.typography.labelMedium)
+                        TextField(
+                            value = upiString,
+                            onValueChange = { upiString = it },
+                            label = { Text("UPI String") },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = DarkZinc,
+                                unfocusedContainerColor = DarkZinc,
+                                focusedTextColor = White,
+                                unfocusedTextColor = White,
+                                focusedBorderColor = PrimaryBlue,
+                                unfocusedBorderColor = Zinc800
+                            ),
+                            trailingIcon = {
+                                IconButton(onClick = { viewModel.processQrCode(upiString) }) {
+                                    Icon(Icons.Default.QrCode, contentDescription = "Scan", tint = PrimaryBlue)
+                                }
+                            }
+                        )
+                        Button(
+                            onClick = { viewModel.processQrCode(upiString) },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                        ) {
+                            Text("Process QR Code")
+                        }
+                    }
+
+                    // 2. Payment Flow
+                    if (state.isQrProcessed) {
+                        Card(
+                            colors = CardDefaults.cardColors(containerColor = DarkZinc),
+                            modifier = Modifier.fillMaxWidth(),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, Zinc800)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("Paying To", color = Zinc400, style = MaterialTheme.typography.labelMedium)
+                                Text(
+                                    text = state.payeeName,
+                                    color = White,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = state.payeeVpa,
+                                    color = Zinc400,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = if (state.isMerchant) "Merchant Payment" else "Personal Transfer",
+                                    color = if (state.isMerchant) PrimaryBlue else Color.Green,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
+                        
+                        // Amount Input
+                        OutlinedTextField(
+                            value = state.amount,
+                            onValueChange = { viewModel.setAmount(it) },
+                            label = { Text("Amount") },
+                            prefix = { Text("₹ ", color = White) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedTextColor = White,
+                                unfocusedTextColor = White,
+                                focusedBorderColor = PrimaryBlue,
+                                unfocusedBorderColor = Zinc800
+                            ),
+                            textStyle = LocalTextStyle.current.copy(fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        )
+
+                        Text("Select Payment Source", color = Zinc400, style = MaterialTheme.typography.labelMedium)
+                        
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            // Bank Accounts List
+                            items(state.bankAccounts) { account ->
+                                PaymentSourceItem(
+                                    title = account.bankName,
+                                    subtitle = "Acct: ****${account.accountNumber.takeLast(4)}",
+                                    balance = "₹${String.format("%.2f", account.balance)}",
+                                    isSelected = state.selectedSourceId == "bank_${account.id}",
+                                    onClick = { viewModel.selectPaymentSource("bank_${account.id}") }
+                                )
+                            }
+
+                            // Credit Cards List
+                            items(state.creditCards) { card ->
+                                val isEnabled = state.isMerchant || card.isRupay
+                                val opacity = if (isEnabled) 1f else 0.5f
+                                
+                                PaymentSourceItem(
+                                    title = card.name,
+                                    subtitle = if (card.isRupay) "Rupay Credit Card" else "Credit Card",
+                                    balance = "Limit: ₹${String.format("%.0f", card.limit)}",
+                                    isSelected = state.selectedSourceId == "card_${card.id}",
+                                    isEnabled = isEnabled,
+                                    onClick = { 
+                                        if (isEnabled) {
+                                            viewModel.selectPaymentSource("card_${card.id}")
+                                        } else {
+                                            Toast.makeText(context, "Credit cards not allowed for personal transfers", Toast.LENGTH_SHORT).show()
+                                        }
+                                    },
+                                    modifier = Modifier.alpha(opacity)
+                                )
+                            }
+                        }
+                        
+                        Spacer(modifier = Modifier.weight(1f))
+                        
+                        Button(
+                            onClick = { viewModel.processPayment() },
+                            modifier = Modifier.fillMaxWidth().height(50.dp),
+                            enabled = state.selectedSourceId != null && state.amount.isNotEmpty() && !state.isLoading,
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                        ) {
+                            Text("Pay Now")
+                        }
+                    }
+                }
+            }
+
+            // 3. Loading Overlay
+            if (state.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(PureBlack.copy(alpha = 0.8f))
+                        .clickable(enabled = false) {}, // Block interaction
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = PrimaryBlue)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Processing Payment...", color = White, fontWeight = FontWeight.Medium)
+                    }
+                }
+            }
+
+            // 4. Success Animation
+            AnimatedVisibility(
+                visible = state.isSuccess,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center)
+            ) {
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(PureBlack)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(60.dp)
-                            .clip(CircleShape)
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        NeonOrange,
-                                        NeonOrangeDark
-                                    )
-                                )
-                            ),
+                            .size(100.dp)
+                            .background(Color.Green, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = recipientName.firstOrNull()?.toString() ?: "U",
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-
-                    Text(
-                        text = recipientName,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = recipientUPI,
-                            fontSize = 12.sp,
-                            color = TextSecondary
-                        )
                         Icon(
-                            imageVector = Icons.Default.CheckCircle,
-                            contentDescription = "Verified",
-                            tint = SuccessGreen,
-                            modifier = Modifier.size(14.dp)
+                            Icons.Default.Check,
+                            contentDescription = "Success",
+                            tint = White,
+                            modifier = Modifier.size(60.dp)
                         )
                     }
-                }
-            }
-
-            // Amount Input
-            PremiumTextField(
-                value = amount,
-                onValueChange = onAmountChange,
-                label = "Enter Amount",
-                placeholder = "₹ 0.00",
-                keyboardType = KeyboardType.Number,
-                leadingIcon = {
+                    Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "₹",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = NeonOrange
-                    )
-                }
-            )
-
-            // Remarks Input
-            PremiumTextField(
-                value = remarks,
-                onValueChange = onRemarksChange,
-                label = "Add Remark (Optional)",
-                placeholder = "E.g., Payment for...",
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit",
-                        tint = TextTertiary,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            PremiumButton(
-                text = "Continue",
-                onClick = onContinue,
-                enabled = amount.isNotEmpty() && amount.toDoubleOrNull() ?: 0.0 > 0
-            )
-        }
-    }
-}
-
-@Composable
-fun AccountSelectionStep(
-    onAccountSelected: (String) -> Unit,
-    onBack: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground)
-    ) {
-        PremiumTopAppBar(
-            title = "Select Account",
-            onBackClick = onBack
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = "Which account do you want to use?",
-                fontSize = 14.sp,
-                color = TextSecondary,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            // Mock accounts
-            repeat(3) { index ->
-                AccountSelectCard(
-                    bankName = listOf("HDFC Bank", "ICICI Bank", "Axis Bank")[index],
-                    accountNumber = "****" + listOf("1234", "5678", "9012")[index],
-                    balance = "₹" + listOf("15,450", "8,900", "25,600")[index],
-                    onClick = {
-                        onAccountSelected("account_${index}")
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "RuPay Card",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = TextPrimary,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-
-            AccountSelectCard(
-                bankName = "RuPay Card",
-                accountNumber = "•••• •••• •••• 4567",
-                balance = "₹45,000",
-                onClick = { onAccountSelected("rupaay_card") },
-                isCard = true
-            )
-        }
-    }
-}
-
-@Composable
-fun AccountSelectCard(
-    bankName: String,
-    accountNumber: String,
-    balance: String,
-    onClick: () -> Unit,
-    isCard: Boolean = false
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = DarkCard)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(
-                        color = if (isCard) NeonOrange.copy(alpha = 0.2f)
-                        else AccentBlue.copy(alpha = 0.2f)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (isCard) Icons.Default.CreditCard else Icons.Default.Business,
-                    contentDescription = if (isCard) "Card" else "Bank",
-                    tint = if (isCard) NeonOrange else AccentBlue,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 12.dp)
-            ) {
-                Text(
-                    text = bankName,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = accountNumber,
-                    fontSize = 11.sp,
-                    color = TextTertiary
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = balance,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = "Check Balance",
-                    fontSize = 10.sp,
-                    color = NeonOrange,
-                    modifier = Modifier.clickable { }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun UPIPinStep(
-    onPinSubmit: (String) -> Unit,
-    onBack: () -> Unit
-) {
-    var pin by remember { mutableStateOf("") }
-    var showPin by remember { mutableStateOf(false) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        PremiumTopAppBar(
-            title = "Enter UPI PIN",
-            onBackClick = onBack,
-            modifier = Modifier.align(Alignment.Start)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Icon(
-            imageVector = Icons.Default.Lock,
-            contentDescription = "PIN",
-            tint = NeonOrange,
-            modifier = Modifier.size(48.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Enter your UPI PIN",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary
-        )
-
-        Text(
-            text = "For secure payment verification",
-            fontSize = 12.sp,
-            color = TextSecondary,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // PIN Input Fields
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            repeat(4) { index ->
-                OutlinedTextField(
-                    value = pin.getOrNull(index)?.toString() ?: "",
-                    onValueChange = { newValue ->
-                        if (newValue.length <= 1) {
-                            val newPin = pin.toMutableList()
-                            if (newValue.isNotEmpty()) {
-                                if (newPin.size <= index) {
-                                    newPin.add(newValue[0])
-                                } else {
-                                    newPin[index] = newValue[0]
-                                }
-                            } else if (index < newPin.size) {
-                                newPin.removeAt(index)
-                            }
-                            pin = newPin.joinToString("")
-                        }
-                    },
-                    modifier = Modifier
-                        .size(60.dp)
-                        .weight(1f),
-                    shape = RoundedCornerShape(12.dp),
-                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                        keyboardType = KeyboardType.Number
-                    ),
-                    visualTransformation = if (showPin) androidx.compose.ui.text.input.VisualTransformation.None
-                    else androidx.compose.ui.text.input.PasswordVisualTransformation(),
-                    textStyle = MaterialTheme.typography.headlineMedium.copy(
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        color = TextPrimary,
+                        "Payment Successful!",
+                        color = White,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
-                    ),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = NeonOrange,
-                        unfocusedBorderColor = TextTertiary.copy(alpha = 0.3f),
-                        focusedTextColor = TextPrimary,
-                        unfocusedTextColor = TextPrimary
-                    ),
-                    singleLine = true
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = if (showPin) "Hide PIN" else "Show PIN",
-                fontSize = 12.sp,
-                color = NeonOrange,
-                modifier = Modifier.clickable { showPin = !showPin }
-            )
-
-            Text(
-                text = "Forgot PIN?",
-                fontSize = 12.sp,
-                color = NeonOrange,
-                modifier = Modifier.clickable { }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        PremiumButton(
-            text = "Confirm Payment",
-            onClick = { onPinSubmit(pin) },
-            enabled = pin.length == 4,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-    }
-}
-
-@Composable
-fun PaymentConfirmationStep(
-    amount: String,
-    recipientName: String,
-    remarks: String,
-    onNewTransaction: () -> Unit,
-    onClose: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Success Animation
-        Box(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(color = SuccessGreen.copy(alpha = 0.2f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = "Success",
-                tint = SuccessGreen,
-                modifier = Modifier.size(60.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = "Payment Successful!",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = TextPrimary
-        )
-
-        Text(
-            text = "₹${amount}",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            color = SuccessGreen,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        Text(
-            text = "sent to $recipientName",
-            fontSize = 14.sp,
-            color = TextSecondary,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = DarkCard)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = "Payment Details",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Amount", fontSize = 12.sp, color = TextSecondary)
-                    Text("₹$amount", fontSize = 12.sp, color = TextPrimary, fontWeight = FontWeight.SemiBold)
-                }
-
-                if (remarks.isNotEmpty()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Remark", fontSize = 12.sp, color = TextSecondary)
-                        Text(remarks, fontSize = 12.sp, color = TextPrimary)
-                    }
-                }
-
-                Divider(modifier = Modifier.padding(vertical = 8.dp), color = TextTertiary.copy(alpha = 0.2f))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text("Date & Time", fontSize = 12.sp, color = TextSecondary)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        java.text.SimpleDateFormat("dd MMM, HH:mm", java.util.Locale.getDefault()).format(
-                            java.util.Date()
-                        ),
-                        fontSize = 12.sp,
-                        color = TextPrimary,
-                        fontWeight = FontWeight.SemiBold
+                        "₹${state.amount} sent to ${state.payeeName}",
+                        color = Zinc400,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            PremiumButton(
-                text = "Make Another Payment",
-                onClick = onNewTransaction
-            )
-
-            PremiumButton(
-                text = "Done",
-                onClick = onClose,
-                backgroundColor = DarkCard,
-                textColor = NeonOrange
-            )
+@Composable
+fun PaymentSourceItem(
+    title: String,
+    subtitle: String,
+    balance: String,
+    isSelected: Boolean,
+    isEnabled: Boolean = true,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(enabled = isEnabled, onClick = onClick)
+            .background(if (isSelected) Zinc800 else DarkZinc, RoundedCornerShape(12.dp))
+            .border(1.dp, if (isSelected) PrimaryBlue else Zinc800, RoundedCornerShape(12.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.CreditCard,
+            contentDescription = null,
+            tint = if(isSelected) PrimaryBlue else Zinc400
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, color = White, fontWeight = FontWeight.SemiBold)
+            Text(subtitle, color = Zinc400, style = MaterialTheme.typography.labelSmall)
         }
+        Text(balance, color = White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }
 }

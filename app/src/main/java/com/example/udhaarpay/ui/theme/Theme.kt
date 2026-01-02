@@ -1,4 +1,4 @@
-package com.udhaarpay.app.presentation.theme
+package com.example.udhaarpay.ui.theme
 
 import android.app.Activity
 import androidx.compose.material3.MaterialTheme
@@ -10,24 +10,33 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue600,
-    background = Black,
-    surface = Zinc900,
-    outline = Zinc800,
+    primary = PrimaryBlue,
+    background = PureBlack,
+    surface = DarkZinc,
     onPrimary = White,
     onBackground = White,
-    onSurface = White
+    onSurface = White,
+    onSurfaceVariant = Zinc400,
+    outline = Zinc800
 )
 
 @Composable
-fun UdhaarPayTheme(content: @Composable () -> Unit) {
+fun UdhaarPayTheme(
+    content: @Composable () -> Unit
+) {
+    val colorScheme = DarkColorScheme
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = Black.toArgb()
+            window.statusBarColor = colorScheme.background.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
-    MaterialTheme(colorScheme = DarkColorScheme, content = content)
+
+    MaterialTheme(
+        colorScheme = colorScheme,
+        typography = AppTypography,
+        content = content
+    )
 }

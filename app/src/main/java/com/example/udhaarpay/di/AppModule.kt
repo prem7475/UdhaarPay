@@ -2,7 +2,13 @@ package com.example.udhaarpay.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.udhaarpay.data.database.UdhaarPayDatabase
+import com.example.udhaarpay.data.local.AppDatabase
+import com.example.udhaarpay.data.local.dao.BankAccountDao
+import com.example.udhaarpay.data.local.dao.CreditCardDao
+import com.example.udhaarpay.data.local.dao.ExpenseDao
+import com.example.udhaarpay.data.local.dao.TransactionDao
+import com.example.udhaarpay.data.local.dao.UdhariDao
+import com.example.udhaarpay.data.local.dao.UserDao
 import com.example.udhaarpay.data.remote.PaymentApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -72,53 +78,39 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideUdhaarPayDatabase(
+    fun provideAppDatabase(
         @ApplicationContext context: Context
-    ): UdhaarPayDatabase {
+    ): AppDatabase {
         return Room.databaseBuilder(
             context,
-            UdhaarPayDatabase::class.java,
+            AppDatabase::class.java,
             "udhaarpay_db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration() // Handle migration strategy as needed
+        .build()
     }
 
     @Singleton
     @Provides
-    fun provideUserDao(database: UdhaarPayDatabase) = database.userDao()
+    fun provideTransactionDao(database: AppDatabase): TransactionDao = database.transactionDao()
 
     @Singleton
     @Provides
-    fun provideCardDao(database: UdhaarPayDatabase) = database.cardDao()
+    fun provideBankAccountDao(database: AppDatabase): BankAccountDao = database.bankAccountDao()
 
     @Singleton
     @Provides
-    fun provideBankAccountDao(database: UdhaarPayDatabase) = database.bankAccountDao()
+    fun provideCreditCardDao(database: AppDatabase): CreditCardDao = database.creditCardDao()
 
     @Singleton
     @Provides
-    fun provideTransactionDao(database: UdhaarPayDatabase) = database.transactionDao()
+    fun provideUdhariDao(database: AppDatabase): UdhariDao = database.udhariDao()
 
     @Singleton
     @Provides
-    fun provideOfferDao(database: UdhaarPayDatabase) = database.offerDao()
+    fun provideUserDao(database: AppDatabase): UserDao = database.userDao()
 
     @Singleton
     @Provides
-    fun provideServiceDao(database: UdhaarPayDatabase) = database.serviceDao()
-
-    @Singleton
-    @Provides
-    fun provideTransactionCategoryDao(database: UdhaarPayDatabase) = database.transactionCategoryDao()
-
-    @Singleton
-    @Provides
-    fun provideSpendingAnalyticsDao(database: UdhaarPayDatabase) = database.spendingAnalyticsDao()
-
-    @Singleton
-    @Provides
-    fun provideQRScanDao(database: UdhaarPayDatabase) = database.qrScanDao()
-
-    @Singleton
-    @Provides
-    fun provideNotificationDao(database: UdhaarPayDatabase) = database.notificationDao()
+    fun provideExpenseDao(database: AppDatabase): ExpenseDao = database.expenseDao()
 }

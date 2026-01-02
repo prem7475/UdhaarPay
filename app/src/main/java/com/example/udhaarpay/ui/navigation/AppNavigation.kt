@@ -5,9 +5,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.example.udhaarpay.ui.screens.WebViewScreen
 import com.example.udhaarpay.ui.screens.analytics.AnalyticsScreen
 import com.example.udhaarpay.ui.screens.auth.AuthScreen
 import com.example.udhaarpay.ui.screens.home.HomeScreen
@@ -37,6 +40,9 @@ sealed class Route(val route: String) {
     object SIPInvestment : Route("sip_investment")
     object OpenDemat : Route("open_demat")
     object CreditScore : Route("credit_score")
+    object WebView : Route("webview/{url}/{title}") {
+        fun createRoute(url: String, title: String) = "webview/$url/$title"
+    }
 }
 
 @Composable
@@ -109,7 +115,10 @@ fun AppNavigation() {
 
         composable(Route.Services.route) {
             ServicesScreen(
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateToWeb = { url, title ->
+                    navController.navigate(Route.WebView.createRoute(url, title))
+                }
             )
         }
 
@@ -150,6 +159,22 @@ fun AppNavigation() {
 
         composable(Route.NFC.route) {
             NFCPaymentScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(
+            route = "webview/{url}/{title}",
+            arguments = listOf(
+                navArgument("url") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val url = backStackEntry.arguments?.getString("url") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: "Browser"
+            WebViewScreen(
+                url = url,
+                title = title,
                 onBack = { navController.popBackStack() }
             )
         }

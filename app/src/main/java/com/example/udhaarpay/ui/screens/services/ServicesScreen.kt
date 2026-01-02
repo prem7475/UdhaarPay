@@ -1,238 +1,314 @@
 package com.example.udhaarpay.ui.screens.services
 
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.udhaarpay.ui.components.PremiumTopAppBar
+import androidx.navigation.NavController
+import com.example.udhaarpay.ui.navigation.Route
 import com.example.udhaarpay.ui.theme.*
-import com.example.udhaarpay.ui.icons.*
-import com.example.udhaarpay.ui.viewmodel.ServiceViewModel
-
-data class ServiceCategory(
-    val name: String,
-    val icon: ImageVector,
-    val color: Color,
-    val services: List<ServiceItem>
-)
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 data class ServiceItem(
-    val icon: ImageVector,
     val name: String,
-    val description: String
+    val icon: ImageVector,
+    val url: String? = null
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServicesScreen(
     onBack: () -> Unit,
-    viewModel: ServiceViewModel = hiltViewModel()
+    navController: NavController? = null,
+    onNavigateToWeb: (String, String) -> Unit = { _, _ -> }
 ) {
-    var selectedCategory by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+    
+    // Bottom Sheet States
+    var showInvestmentSheet by remember { mutableStateOf(false) }
+    var showRechargeSheet by remember { mutableStateOf(false) }
+    var selectedServiceTitle by remember { mutableStateOf("") }
 
-    val serviceCategories = listOf(
-        ServiceCategory(
-            name = "Recharge & Bills",
-            icon = Icons.Default.PhoneAndroid,
-            color = NeonOrange,
-            services = listOf(
-                ServiceItem(PhoneAndroid, "Mobile Recharge", "Prepaid & Postpaid"),
-                ServiceItem(ElectricBolt, "Electricity Bill", "Pay online instantly"),
-                ServiceItem(Wifi, "Broadband", "Landline & Internet"),
-                ServiceItem(Droplet, "Water Bill", "Municipal bills"),
-                ServiceItem(LocalFireDepartment, "Gas Cylinder", "Home delivery booking"),
-                ServiceItem(Tv, "DTH/Cable", "Recharge instantly")
-            )
-        ),
-        ServiceCategory(
-            name = "Travel & Bookings",
-            icon = Icons.Default.Flight,
-            color = AccentBlue,
-            services = listOf(
-                ServiceItem(Flight, "Flight Booking", "Domestic & International"),
-                ServiceItem(Train, "Train Ticket", "IRCTC & more"),
-                ServiceItem(DirectionsBus, "Bus Ticket", "Across India"),
-                ServiceItem(Hotel, "Hotel Booking", "Best deals"),
-                ServiceItem(Movie, "Movie Tickets", "All theatres")
-            )
-        ),
-        ServiceCategory(
-            name = "Finance & Investing",
-            icon = Icons.Default.TrendingUp,
-            color = SuccessGreen,
-            services = listOf(
-                ServiceItem(AccountBalance, "Demat Account", "Open free account"),
-                ServiceItem(TrendingUp, "Mutual Funds", "Invest wisely"),
-                ServiceItem(Savings, "SIP Investments", "Start investing"),
-                ServiceItem(Security, "Insurance", "Protect family"),
-                ServiceItem(Loan, "Loans", "Get approved"),
-                ServiceItem(CreditScore, "Credit Score", "Check instantly")
-            )
-        )
+    val billPayments = listOf(
+        ServiceItem("Mobile", Icons.Rounded.PhoneAndroid),
+        ServiceItem("DTH", Icons.Rounded.Tv),
+        ServiceItem("Electricity", Icons.Rounded.ElectricBolt),
+        ServiceItem("FastTag", Icons.Rounded.DirectionsCar)
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = DarkBackground)
-    ) {
-        PremiumTopAppBar(
-            title = "Services",
-            onBackClick = onBack
-        )
+    val travelBooking = listOf(
+        ServiceItem("Flight", Icons.Rounded.Flight, "https://www.skyscanner.co.in"),
+        ServiceItem("Train", Icons.Rounded.Train, "https://www.irctc.co.in"),
+        ServiceItem("Bus", Icons.Rounded.DirectionsBus, "https://www.redbus.in"),
+        ServiceItem("Movie", Icons.Rounded.Movie, "https://in.bookmyshow.com")
+    )
 
-        // Category Tabs
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 4.dp)
-        ) {
-            items(serviceCategories.size) { index ->
-                FilterChip(
-                    selected = selectedCategory == index,
-                    onClick = { selectedCategory = index },
-                    label = {
-                        Text(
-                            text = serviceCategories[index].name,
-                            fontSize = 12.sp,
-                            fontWeight = if (selectedCategory == index) FontWeight.Bold else FontWeight.Normal
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = serviceCategories[index].icon,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = NeonOrange,
-                        selectedLabelColor = DarkBackground,
-                        containerColor = DarkCard,
-                        labelColor = TextSecondary,
-                        selectedLeadingIconColor = DarkBackground,
-                        leadingIconColor = TextTertiary
-                    ),
-                    border = if (selectedCategory == index) null else FilterChipDefaults.border(
-                        borderColor = TextTertiary.copy(alpha = 0.3f)
-                    )
+    val finance = listOf(
+        ServiceItem("Invest", Icons.Rounded.TrendingUp),
+        ServiceItem("Insurance", Icons.Rounded.HealthAndSafety),
+        ServiceItem("Demat", Icons.Rounded.AccountBalance),
+        ServiceItem("Loans", Icons.Rounded.MonetizationOn)
+    )
+
+    Scaffold(
+        containerColor = PureBlack,
+        topBar = {
+            // Simple Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ArrowBack,
+                    contentDescription = "Back",
+                    tint = White,
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable(onClick = onBack)
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "Services",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = White,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
+    ) { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Section 1: Bill Payments
+                item(span = { GridItemSpan(4) }) {
+                    SectionHeader("Bill Payments")
+                }
+                items(billPayments) { service ->
+                    ServiceItemView(service) {
+                        if (service.name == "Mobile") {
+                            showRechargeSheet = true
+                        } else {
+                            Toast.makeText(context, "Coming Soon: ${service.name}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
 
-        Spacer(modifier = Modifier.height(16.dp))
+                // Section 2: Travel Booking
+                item(span = { GridItemSpan(4) }) {
+                    SectionHeader("Travel Booking")
+                }
+                items(travelBooking) { service ->
+                    ServiceItemView(service) {
+                        if (service.url != null) {
+                            val encodedUrl = URLEncoder.encode(service.url, StandardCharsets.UTF_8.toString())
+                            onNavigateToWeb(encodedUrl, service.name)
+                        } else {
+                            Toast.makeText(context, "Coming Soon: ${service.name}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
 
-        // Services Grid
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 24.dp)
-        ) {
-            val currentCategory = serviceCategories[selectedCategory]
-            items(currentCategory.services) { service ->
-                ServiceGridCard(
-                    icon = service.icon,
-                    name = service.name,
-                    description = service.description,
-                    color = currentCategory.color,
-                    onClick = { }
-                )
+                // Section 3: Finance
+                item(span = { GridItemSpan(4) }) {
+                    SectionHeader("Finance")
+                }
+                items(finance) { service ->
+                    ServiceItemView(service) {
+                        if (service.name == "Invest" || service.name == "Demat") {
+                            selectedServiceTitle = if (service.name == "Invest") "Investment Platforms" else "Open Demat Account"
+                            showInvestmentSheet = true
+                        } else {
+                            Toast.makeText(context, "Coming Soon: ${service.name}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+
+                // Bottom padding
+                item(span = { GridItemSpan(4) }) {
+                    Spacer(modifier = Modifier.height(32.dp))
+                }
+            }
+
+            // Investment Bottom Sheet
+            if (showInvestmentSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showInvestmentSheet = false },
+                    containerColor = DarkZinc
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                            .padding(bottom = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(selectedServiceTitle, style = MaterialTheme.typography.titleLarge, color = White)
+                        
+                        BottomSheetOption(
+                            title = "Zerodha", 
+                            subtitle = "Stocks, F&O, Direct Mutual Funds",
+                            onClick = {
+                                showInvestmentSheet = false
+                                val url = URLEncoder.encode("https://zerodha.com", StandardCharsets.UTF_8.toString())
+                                onNavigateToWeb(url, "Zerodha")
+                            }
+                        )
+                        
+                        BottomSheetOption(
+                            title = "Groww", 
+                            subtitle = "Stocks, Mutual Funds, IPOs",
+                            onClick = {
+                                showInvestmentSheet = false
+                                val url = URLEncoder.encode("https://groww.in", StandardCharsets.UTF_8.toString())
+                                onNavigateToWeb(url, "Groww")
+                            }
+                        )
+                        
+                        BottomSheetOption(
+                            title = "Upstox", 
+                            subtitle = "Invest in Stocks, IPOs & Mutual Funds",
+                            onClick = {
+                                showInvestmentSheet = false
+                                // Placeholder URL or just close
+                                Toast.makeText(context, "Opening Upstox...", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Recharge Bottom Sheet
+            if (showRechargeSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showRechargeSheet = false },
+                    containerColor = DarkZinc
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                            .padding(bottom = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text("Select Operator", style = MaterialTheme.typography.titleLarge, color = White)
+                        
+                        BottomSheetOption(
+                            title = "Jio", 
+                            subtitle = "Prepaid & Postpaid Plans",
+                            onClick = {
+                                showRechargeSheet = false
+                                val url = URLEncoder.encode("https://www.jio.com/selfcare/recharge", StandardCharsets.UTF_8.toString())
+                                onNavigateToWeb(url, "Jio Recharge")
+                            }
+                        )
+                        
+                        BottomSheetOption(
+                            title = "Airtel", 
+                            subtitle = "Recharge Online",
+                            onClick = {
+                                showRechargeSheet = false
+                                val url = URLEncoder.encode("https://www.airtel.in/recharge", StandardCharsets.UTF_8.toString())
+                                onNavigateToWeb(url, "Airtel Recharge")
+                            }
+                        )
+                        
+                        BottomSheetOption(
+                            title = "Vi", 
+                            subtitle = "Vodafone Idea Recharge",
+                            onClick = {
+                                showRechargeSheet = false
+                                Toast.makeText(context, "Vi Recharge Selected", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 @Composable
-fun ServiceGridCard(
-    icon: ImageVector,
-    name: String,
-    description: String,
-    color: Color,
-    onClick: () -> Unit
-) {
-    Card(
+fun BottomSheetOption(title: String, subtitle: String, onClick: () -> Unit) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = DarkCard)
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, color = White, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(subtitle, color = Zinc400, style = MaterialTheme.typography.bodySmall)
+        }
+        Icon(Icons.Rounded.ArrowForwardIos, contentDescription = null, tint = Zinc400, modifier = Modifier.size(16.dp))
+    }
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        color = White,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(top = 8.dp)
+    )
+}
+
+@Composable
+fun ServiceItemView(service: ServiceItem, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable(onClick = onClick)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            color.copy(alpha = 0.15f),
-                            color.copy(alpha = 0.05f)
-                        )
-                    )
-                )
-                .padding(12.dp)
+                .size(56.dp)
+                .background(DarkZinc, CircleShape)
+                .padding(12.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(color = color.copy(alpha = 0.2f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = name,
-                        tint = color,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = name,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-                    Text(
-                        text = description,
-                        fontSize = 10.sp,
-                        color = TextTertiary,
-                        maxLines = 1
-                    )
-                }
-            }
+            Icon(
+                imageVector = service.icon,
+                contentDescription = service.name,
+                tint = PrimaryBlue,
+                modifier = Modifier.fillMaxSize()
+            )
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = service.name,
+            style = MaterialTheme.typography.bodySmall,
+            color = Zinc400,
+            fontSize = 12.sp,
+            maxLines = 1
+        )
     }
 }
