@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_menu_home"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_edit_profile"
+            android:icon="@drawable/ic_menu_edit"
+            android:title="Edit Profile" />
+        <item
+            android:id="@+id/nav_scan_pay"
+            android:icon="@drawable/ic_qr_code_scanner"
+            android:title="Scan &amp; Pay" />
+        <item
+            android:id="@+id/nav_transaction_history"
+            android:icon="@android:drawable/ic_menu_recent_history"
+            android:title="Transaction History" />
+    </group>
+
+    <item android:title="Manage Accounts">
+        <menu>
+            <item
+                android:id="@+id/nav_add_bank_account"
+                android:icon="@drawable/ic_bank"
+                android:title="Add Bank Account" />
+            <item
+                android:id="@+id/nav_add_credit_card"
+                android:icon="@android:drawable/ic_menu_add"
+                android:title="Add Credit Card" />
+            <item
+                android:id="@+id/nav_apply_for_card"
+                android:icon="@android:drawable/ic_menu_send"
+                android:title="Apply for New Card" />
+        </menu>
+    </item>
+
+    <item android:title="Account Actions">
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@android:drawable/ic_menu_revert"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>

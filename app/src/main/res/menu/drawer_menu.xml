@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This is the list of items in the hamburger menu -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Profile Section -->
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@android:drawable/ic_menu_edit"
+            android:title="Edit Profile" />
+        <item
+            android:id="@+id/nav_personal"
+            android:icon="@android:drawable/ic_menu_my_calendar"
+            android:title="Personal Profile" />
+    </group>
+
+    <!-- Services Section -->
+    <item android:title="Services">
+        <menu>
+            <item
+                android:id="@+id/nav_mobile_recharge"
+                android:icon="@drawable/ic_phone"
+                android:title="Mobile Recharge" />
+            <item
+                android:id="@+id/nav_bill_payments"
+                android:icon="@drawable/ic_bill"
+                android:title="Bill Payments" />
+            <item
+                android:id="@+id/nav_investment"
+                android:icon="@drawable/ic_investment"
+                android:title="Investment" />
+            <item
+                android:id="@+id/nav_insurance"
+                android:icon="@drawable/ic_insurance"
+                android:title="Insurance" />
+            <item
+                android:id="@+id/nav_credit_card"
+                android:icon="@drawable/ic_credit_card"
+                android:title="Credit Card" />
+            <item
+                android:id="@+id/nav_support"
+                android:icon="@drawable/ic_support"
+                android:title="Support" />
+        </menu>
+    </item>
+
+    <!-- Help & Contact Section -->
+    <item android:title="Help &amp; Contact">
+        <menu>
+            <item
+                android:id="@+id/nav_chat_support"
+                android:icon="@drawable/ic_support"
+                android:title="Chat Support" />
+            <item
+                android:id="@+id/nav_help"
+                android:icon="@android:drawable/ic_menu_help"
+                android:title="Help" />
+        </menu>
+    </item>
+
+    <!-- Logout -->
+    <item android:title="">
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@android:drawable/ic_lock_power_off"
+                android:title="@string/menu_logout" />
+        </menu>
+    </item>
+</menu>

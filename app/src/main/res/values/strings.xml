@@ -1,0 +1,130 @@
+<resources>
+    <string name="app_name">UDHAARPAY</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Welcome to UDHAARPAY</string>
+    <string name="login_subtitle">India\'s most-loved payments app.</string>
+    <string name="login_mobile_hint">Enter Mobile Number</string>
+    <string name="login_button_text">Login Securely</string>
+    <string name="login_terms">By logging in, you agree to our Terms &amp; Conditions and Privacy Policy.</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_cashback">Cashback</string>
+    <string name="nav_history">History</string>
+    <string name="nav_bank">Bank</string>
+
+    <!-- Hamburger Menu -->
+    <string name="menu_profile">Edit Profile</string>
+    <string name="menu_kyc">e-KYC</string>
+    <string name="menu_business">Business Profile</string>
+    <string name="menu_personal">Personal Profile</string>
+    <string name="menu_logout">Logout</string>
+    <string name="profile_name">Aarav Patel</string>
+    <string name="profile_phone">+91 98XXXXXX00</string>
+    <string name="profile_email">aarav.patel@example.com</string>
+
+    <!-- Home Screen -->
+    <string name="wallet_balance">Wallet Balance</string>
+    <string name="add_money">Add Money</string>
+    <string name="to_bank">To Bank</string>
+    <string name="add_bank">Add Bank</string>
+    <string name="book_tickets">Book Tickets</string>
+    <string name="flights">Flights</string>
+    <string name="bus">Bus</string>
+    <string name="trains">Trains</string>
+    <string name="movies">Movies</string>
+    <string name="invest_grow">Invest &amp; Grow</string>
+    <string name="stocks">Stocks</string>
+    <string name="mutual_funds">Mutual Funds</string>
+    <string name="sip">SIP</string>
+    <string name="gold">Gold</string>
+    <string name="pay_bills">Pay Bills</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="recent_transactions">Recent Transactions</string>
+    <string name="view_all_transactions">View All Transactions</string>
+    <string name="scan_qr">Scan QR</string>
+    <string name="mobile_recharge">Mobile Recharge</string>
+    <string name="bank_transfer">Bank Transfer</string>
+    <string name="qr_pay">QR Pay</string>
+    <string name="passbook">Passbook</string>
+    <string name="offers">Offers</string>
+    <string name="recharge">Recharge</string>
+    <string name="hello_user">Hello, </string>
+
+    <!-- Payment Flow -->
+    <string name="payee_details">Payee Details</string>
+    <string name="payee_name">Payee Name</string>
+    <string name="payee_upi_id">UPI ID</string>
+    <string name="account_selection">Select Account</string>
+    <string name="enter_amount">Enter Amount</string>
+    <string name="pay_now">Pay Now</string>
+    <string name="enter_upi_pin">Enter UPI PIN</string>
+    <string name="payment_successful">Payment Successful!</string>
+    <string name="payment_details">Payment Details</string>
+    <string name="cashback_earned">Cashback Earned</string>
+    <string name="pay_again">Pay Again</string>
+    <string name="go_home">Home</string>
+    <string name="congratulations">Congratulations!</string>
+    <string name="webview_loading">Loading...</string>
+    <string name="webview_error">Error loading page</string>
+
+    <!-- Paytm-like Home Screen Strings -->
+    <string name="link_rupay">Link RuPay</string>
+    <string name="balance_history">Balance &amp; History</string>
+    <string name="view_default_bank">View Default Bank</string>
+    <string name="bill_payments_recharges">Bill Payments &amp; Recharges</string>
+    <string name="electricity_bill">Electricity Bill</string>
+    <string name="dth_recharge">DTH Recharge</string>
+    <string name="gas_booking">Gas Booking</string>
+    <string name="financial_services">Financial Services &amp; More</string>
+    <string name="ticket_booking">Ticket Booking</string>
+    <string name="insurance">Insurance</string>
+    <string name="investing">Investing</string>
+    <string name="cashback_offers">Cashback &amp; Offers</string>
+
+    <!-- Profile Screen -->
+    <string name="personal_qr_code">Personal QR Code</string>
+    <string name="share_qr">Share</string>
+    <string name="download_qr">Download QR</string>
+    <string name="payment_settings">Payment Settings</string>
+    <string name="help_support">Help &amp; Support</string>
+    <string name="chat_support">Chat Support</string>
+
+    <!-- Payment Settings -->
+    <string name="add_bank_account">Add Bank Account</string>
+    <string name="linked_accounts">Linked Accounts</string>
+    <string name="check_balance">Check Balance</string>
+    <string name="set_default">Set as Default</string>
+    <string name="remove_account">Remove Account</string>
+
+    <!-- History Screen -->
+    <string name="transactions">Transactions</string>
+    <string name="check_balance_tab">Check Balance</string>
+
+    <!-- Service Activities -->
+    <string name="enter_mobile_number">Enter Mobile Number</string>
+    <string name="browse_plans">Browse Plans</string>
+    <string name="proceed_to_pay">Proceed to Pay</string>
+    <string name="scan_pay">Scan &amp; Pay</string>
+    <string name="to_mobile">To Mobile</string>
+    <string name="check_balance_instruction">Enter your account details to check balance</string>
+    <string name="default_account">Default Account</string>
+    <string name="buses">Buses</string>
+
+    <!-- Placeholder Fragment Text -->
+    <string name="cashback_fragment_title">Cashback Fragment</string>
+    <string name="history_fragment_title">History Fragment</string>
+    <string name="bank_fragment_title">Bank Fragment</string>
+
+    <!-- Missing Strings for Menus and Navigation -->
+    <string name="image_view_item_transform_content_description">Transform Image</string>
+    <string name="menu_transform">Transform</string>
+    <string name="menu_reflow">Reflow</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_home">Home</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+</resources>

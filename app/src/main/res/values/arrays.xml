@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="expense_categories">
+        <item>Food and Dining</item>
+        <item>Transportation</item>
+        <item>Shopping</item>
+        <item>Entertainment</item>
+        <item>Bills and Utilities</item>
+        <item>Healthcare</item>
+        <item>Education</item>
+        <item>Travel</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="bank_accounts">
+        <item>SBI - ****1234</item>
+        <item>HDFC - ****5678</item>
+        <item>ICICI - ****9012</item>
+        <item>Axis - ****3456</item>
+    </string-array>
+    <string-array name="bill_types">
+        <item>Electricity</item>
+        <item>Gas</item>
+        <item>Water</item>
+        <item>Internet</item>
+        <item>Mobile</item>
+        <item>Cable TV</item>
+        <item>Insurance</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="mobile_operators">
+        <item>Airtel</item>
+        <item>Jio</item>
+        <item>VI (Vodafone Idea)</item>
+        <item>BSNL</item>
+        <item>MTNL</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="circles">
+        <item>Andhra Pradesh</item>
+        <item>Bihar</item>
+        <item>Delhi</item>
+        <item>Gujarat</item>
+        <item>Haryana</item>
+        <item>Karnataka</item>
+        <item>Kerala</item>
+        <item>Maharashtra</item>
+        <item>Punjab</item>
+        <item>Rajasthan</item>
+        <item>Tamil Nadu</item>
+        <item>Uttar Pradesh</item>
+        <item>West Bengal</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="dth_operators">
+        <item>Airtel Digital TV</item>
+        <item>Dish TV</item>
+        <item>Tata Play</item>
+        <item>Sun Direct</item>
+        <item>Videocon D2H</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="states">
+        <item>Andhra Pradesh</item>
+        <item>Arunachal Pradesh</item>
+        <item>Assam</item>
+        <item>Bihar</item>
+        <item>Chhattisgarh</item>
+        <item>Goa</item>
+        <item>Gujarat</item>
+        <item>Haryana</item>
+        <item>Himachal Pradesh</item>
+        <item>Jharkhand</item>
+        <item>Karnataka</item>
+        <item>Kerala</item>
+        <item>Madhya Pradesh</item>
+        <item>Maharashtra</item>
+        <item>Manipur</item>
+        <item>Meghalaya</item>
+        <item>Mizoram</item>
+        <item>Nagaland</item>
+        <item>Odisha</item>
+        <item>Punjab</item>
+        <item>Rajasthan</item>
+        <item>Sikkim</item>
+        <item>Tamil Nadu</item>
+        <item>Telangana</item>
+        <item>Tripura</item>
+        <item>Uttar Pradesh</item>
+        <item>Uttarakhand</item>
+        <item>West Bengal</item>
+        <item>Delhi</item>
+        <item>Jammu and Kashmir</item>
+        <item>Ladakh</item>
+        <item>Puducherry</item>
+        <item>Chandigarh</item>
+        <item>Andaman and Nicobar Islands</item>
+        <item>Dadra and Nagar Haveli and Daman and Diu</item>
+        <item>Lakshadweep</item>
+    </string-array>
+    <string-array name="electricity_boards">
+        <item>BESCOM (Bangalore)</item>
+        <item>MESCOM (Mysore)</item>
+        <item>CESCOM (Chitradurga)</item>
+        <item>HESCOM (Hubli)</item>
+        <item>GESCOM (Gulbarga)</item>
+        <item>Torrent Power</item>
+        <item>Reliance Energy</item>
+        <item>Adani Electricity</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="gas_providers">
+        <item>Indane (Indian Oil)</item>
+        <item>Bharat Gas (BPCL)</item>
+        <item>HP Gas</item>
+        <item>Mahanagar Gas</item>
+        <item>Gujarat Gas</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="water_boards">
+        <item>BWSSB (Bangalore)</item>
+        <item>MWSSB (Mumbai)</item>
+        <item>DJB (Delhi)</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="internet_providers">
+        <item>Airtel</item>
+        <item>Jio</item>
+        <item>BSNL</item>
+        <item>MTNL</item>
+        <item>Vodafone</item>
+        <item>ACT Fibernet</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="internet_plans">
+        <item>Monthly Plan</item>
+        <item>Quarterly Plan</item>
+        <item>Half-Yearly Plan</item>
+        <item>Yearly Plan</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="broadband_providers">
+        <item>Airtel Broadband</item>
+        <item>Jio Fiber</item>
+        <item>BSNL Broadband</item>
+        <item>MTNL Broadband</item>
+        <item>Vodafone Broadband</item>
+        <item>ACT Fibernet</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="broadband_plans">
+        <item>Basic Plan (50 Mbps)</item>
+        <item>Standard Plan (100 Mbps)</item>
+        <item>Premium Plan (200 Mbps)</item>
+        <item>Ultra Plan (500 Mbps)</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="bus_operators">
+        <item>RedBus</item>
+        <item>MakeMyTrip</item>
+        <item>AbhiBus</item>
+        <item>Orange Travels</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="ticket_types">
+        <item>Bus</item>
+        <item>Train</item>
+        <item>Flight</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="investment_types">
+        <item>Stocks</item>
+        <item>Mutual Funds</item>
+        <item>Gold</item>
+        <item>Bonds</item>
+        <item>Other</item>
+    </string-array>
+</resources>

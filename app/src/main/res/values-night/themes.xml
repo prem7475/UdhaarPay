@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme (Night Mode) -->
+    <style name="Theme.UDHAARPAY" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/app_blue_dark</item>
+        <item name="colorPrimaryVariant">@color/app_blue_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/app_blue_light</item>
+        <item name="colorSecondaryVariant">@color/app_blue_light</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
+    
+    <style name="Theme.UDHAARPAY.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.UDHAARPAY.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>

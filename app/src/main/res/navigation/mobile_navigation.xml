@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/splash_fragment">
+
+    <fragment
+        android:id="@+id/splash_fragment"
+        android:name="com.example.udhaarpay.ui.auth.SplashFragment"
+        android:label="SplashFragment"
+        tools:layout="@layout/fragment_splash">
+        <action
+            android:id="@+id/action_splash_fragment_to_login_fragment"
+            app:destination="@id/login_fragment"
+            app:popUpTo="@id/splash_fragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splash_fragment_to_home_fragment"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/splash_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/login_fragment"
+        android:name="com.example.udhaarpay.ui.auth.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_login_fragment_to_otp_fragment"
+            app:destination="@id/otp_fragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/otp_fragment"
+        android:name="com.example.udhaarpay.ui.auth.OtpFragment"
+        android:label="OtpFragment"
+        tools:layout="@layout/fragment_otp">
+        <action
+            android:id="@+id/action_otp_fragment_to_profile_setup_fragment"
+            app:destination="@id/profile_setup_fragment"
+            app:popUpTo="@id/login_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/profile_setup_fragment"
+        android:name="com.example.udhaarpay.ui.auth.ProfileSetupFragment"
+        android:label="ProfileSetupFragment"
+        tools:layout="@layout/fragment_profile_setup">
+        <action
+            android:id="@+id/action_profile_setup_fragment_to_home_fragment"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/profile_setup_fragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_home"
+        android:name="com.example.udhaarpay.ui.dashboard.HomeFragment"
+        android:label="@string/menu_home"
+        tools:layout="@layout/fragment_home" />
+        
+    <fragment
+        android:id="@+id/nav_bank"
+        android:name="com.example.udhaarpay.BankFragmentKt"
+        android:label="@string/nav_bank"
+        tools:layout="@layout/fragment_bank" >
+        <action
+            android:id="@+id/action_nav_bank_to_selectBankFragment"
+            app:destination="@id/selectBankFragment" />
+    </fragment>
+    
+    <fragment
+        android:id="@+id/selectBankFragment"
+        android:name="com.example.udhaarpay.ui.account.SelectBankFragment"
+        android:label="Select Bank"
+        tools:layout="@layout/fragment_select_bank" />
+
+    <fragment
+        android:id="@+id/nav_edit_profile"
+        android:name="com.example.udhaarpay.ui.profile.EditProfileFragment"
+        android:label="Edit Profile"
+        tools:layout="@layout/fragment_edit_profile" />
+
+    <fragment
+        android:id="@+id/nav_scan_pay"
+        android:name="com.example.udhaarpay.ui.scan.ScanPayFragment"
+        android:label="Scan &amp; Pay"
+        tools:layout="@layout/fragment_scan_pay" />
+
+    <fragment
+        android:id="@+id/nav_transaction_history"
+        android:name="com.example.udhaarpay.ui.transactions.TransactionHistoryFragment"
+        android:label="Transaction History"
+        tools:layout="@layout/fragment_transaction_history" />
+
+    <fragment
+        android:id="@+id/nav_add_bank_account"
+        android:name="com.example.udhaarpay.ui.accounts.AddBankAccountFragment"
+        android:label="Add Bank Account"
+        tools:layout="@layout/fragment_add_bank_account" />
+
+    <fragment
+        android:id="@+id/nav_add_credit_card"
+        android:name="com.example.udhaarpay.ui.accounts.AddCreditCardFragment"
+        android:label="Add Credit Card"
+        tools:layout="@layout/fragment_add_credit_card" />
+
+    <fragment
+        android:id="@+id/nav_apply_for_card"
+        android:name="com.example.udhaarpay.ui.cards.ApplyForCardFragment"
+        android:label="Apply for New Card"
+        tools:layout="@layout/fragment_apply_for_card" />
+
+</navigation>

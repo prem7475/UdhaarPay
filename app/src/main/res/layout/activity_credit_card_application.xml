@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Credit Card Application"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp" />
+
+    <Spinner
+        android:id="@+id/spCardType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etAnnualIncome"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Annual Income"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etEmploymentDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Employment Details"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Address"
+        android:layout_marginBottom="24dp" />
+
+    <Button
+        android:id="@+id/btnApplyCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Apply for Credit Card" />
+
+</LinearLayout>
