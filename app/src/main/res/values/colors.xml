@@ -1,184 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary Brand Colors - Professional Blue -->
-    <color name="primary">#1976D2</color>
-    <color name="primary_dark">#1565C0</color>
-    <color name="primary_light">#42A5F5</color>
-    <color name="primary_variant">#0D47A1</color>
-    
-    <!-- App Specific Blue Colors -->
-    <color name="app_blue_dark">#1565C0</color>
-    <color name="app_blue_light">#42A5F5</color>
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1E40AF</color>
+    <color name="primary_light">#3B82F6</color>
+    <color name="accent">#22C55E</color>
 
-    <!-- Secondary Colors - Professional Orange -->
-    <color name="secondary">#FF6D00</color>
-    <color name="secondary_dark">#E65100</color>
-    <color name="secondary_light">#FF9E40</color>
-    <color name="secondary_variant">#BF360C</color>
-
-    <!-- Accent Colors - Professional Green -->
-    <color name="accent">#4CAF50</color>
-    <color name="accent_dark">#388E3C</color>
-    <color name="accent_light">#81C784</color>
-
-    <!-- Semantic Colors -->
-    <color name="success">#4CAF50</color>
-    <color name="error">#F44336</color>
-    <color name="warning">#FF9800</color>
-    <color name="info">#2196F3</color>
-
-    <!-- Background Colors -->
-    <color name="background_primary">#FAFAFA</color>
-    <color name="background_secondary">#FFFFFF</color>
-    <color name="background_tertiary">#F5F5F5</color>
-    <color name="background_overlay">#80000000</color>
-
-    <!-- Surface Colors -->
-    <color name="surface_primary">#FFFFFF</color>
-    <color name="surface_secondary">#F8F9FA</color>
-    <color name="surface_tertiary">#E9ECEF</color>
-    <color name="surface_elevated">#FFFFFF</color>
-
-    <!-- Text Colors -->
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
-    <color name="text_tertiary">#BDBDBD</color>
-    <color name="text_hint">#9E9E9E</color>
-    <color name="text_on_primary">#FFFFFF</color>
-    <color name="text_on_secondary">#FFFFFF</color>
-    <color name="text_on_accent">#FFFFFF</color>
-
-    <!-- Border Colors -->
-    <color name="border_light">#E0E0E0</color>
-    <color name="border_medium">#BDBDBD</color>
-    <color name="border_dark">#757575</color>
-
-    <!-- Status Colors -->
-    <color name="status_pending">#FF9800</color>
-    <color name="status_success">#4CAF50</color>
-    <color name="status_failed">#F44336</color>
-    <color name="status_processing">#2196F3</color>
-
-    <!-- Transaction Type Colors -->
-    <color name="transaction_credit">#4CAF50</color>
-    <color name="transaction_debit">#F44336</color>
-    <color name="transaction_pending">#FF9800</color>
-    <color name="transaction_failed">#9E9E9E</color>
-
-    <!-- Gradient Colors -->
-    <color name="gradient_start">#1976D2</color>
-    <color name="gradient_middle">#42A5F5</color>
-    <color name="gradient_end">#0D47A1</color>
-
-    <!-- Wallet Colors -->
-    <color name="wallet_primary">#FF6D00</color>
-    <color name="wallet_secondary">#FF9E40</color>
-    <color name="wallet_background">#FFF3E0</color>
-
-    <!-- Card Colors -->
-    <color name="card_background">#FFFFFF</color>
-    <color name="card_border">#E0E0E0</color>
-    <color name="card_shadow">#1F000000</color>
-
-    <!-- Button Colors -->
-    <color name="button_primary">#1976D2</color>
-    <color name="button_primary_pressed">#1565C0</color>
-    <color name="button_secondary">#FFFFFF</color>
-    <color name="button_secondary_border">#1976D2</color>
-    <color name="button_disabled">#BDBDBD</color>
-
-    <!-- Input Field Colors -->
-    <color name="input_background">#F5F5F5</color>
-    <color name="input_border">#E0E0E0</color>
-    <color name="input_border_focused">#1976D2</color>
-    <color name="input_error">#F44336</color>
-
-    <!-- Tab Colors -->
-    <color name="tab_selected">#1976D2</color>
-    <color name="tab_unselected">#757575</color>
-    <color name="tab_indicator">#1976D2</color>
-
-    <!-- Bottom Navigation Colors -->
-    <color name="bottom_nav_selected">#1976D2</color>
-    <color name="bottom_nav_unselected">#757575</color>
-
-    <!-- Notification Colors -->
-    <color name="notification_background">#FFFFFF</color>
-    <color name="notification_accent">#1976D2</color>
-
-    <!-- Ripple Colors -->
-    <color name="ripple_primary">#331976D2</color>
-    <color name="ripple_secondary">#33FFFFFF</color>
-
-    <!-- Transparent Colors -->
-    <color name="transparent">#00000000</color>
-    <color name="semi_transparent">#80000000</color>
-    <color name="semi_transparent_light">#40000000</color>
-
-    <!-- Legacy Colors (for backward compatibility) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <color name="transparent">#00000000</color>
 
-    <!-- Professional Color Palette -->
-    <color name="colorPrimary">#1976D2</color>
+    <color name="background_primary">#000000</color>
+    <color name="surface_primary">#18181B</color>
+
+    <color name="border_default">#27272A</color>
+    <color name="borders">#27272A</color> <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A1A1AA</color>
+
+    <color name="error">#DC2626</color>
+    <color name="success">#16A34A</color>
+
+    <color name="app_blue_light">#3B82F6</color>
+
+    <color name="background_gradient_start">#000000</color>
+    <color name="background_gradient_end">#18181B</color>
+    <color name="gradient_primary_start">#2563EB</color>
+    <color name="gradient_primary_end">#1E40AF</color>
+
+    <color name="colorPrimary">#2563EB</color>
+    <color name="colorPrimaryVariant">#1E40AF</color>
     <color name="colorOnPrimary">#FFFFFF</color>
-    <color name="colorPrimaryContainer">#E3F2FD</color>
-    <color name="colorOnPrimaryContainer">#1976D2</color>
 
-    <color name="colorSecondary">#FF6D00</color>
+    <color name="colorPrimaryContainer">#1E3A8A</color> <color name="colorOnPrimaryContainer">#FFFFFF</color> <color name="colorSecondary">#27272A</color>
+    <color name="colorSecondaryVariant">#27272A</color>
     <color name="colorOnSecondary">#FFFFFF</color>
-    <color name="colorSecondaryContainer">#FFF3E0</color>
-    <color name="colorOnSecondaryContainer">#FF6D00</color>
+    <color name="colorSecondaryContainer">#27272A</color>
+    <color name="colorOnSecondaryContainer">#FFFFFF</color>
 
-    <color name="colorTertiary">#4CAF50</color>
-    <color name="colorOnTertiary">#FFFFFF</color>
-    <color name="colorTertiaryContainer">#E8F5E8</color>
-    <color name="colorOnTertiaryContainer">#4CAF50</color>
+    <color name="colorBackground">#000000</color>
+    <color name="colorOnBackground">#FFFFFF</color>
 
-    <color name="colorError">#F44336</color>
+    <color name="colorSurface">#18181B</color>
+    <color name="colorOnSurface">#FFFFFF</color>
+    <color name="colorSurfaceVariant">#27272A</color>
+    <color name="colorOnSurfaceVariant">#A1A1AA</color>
+    <color name="colorOutline">#52525B</color>
+
+    <color name="colorError">#DC2626</color>
     <color name="colorOnError">#FFFFFF</color>
-    <color name="colorErrorContainer">#FFEBEE</color>
-    <color name="colorOnErrorContainer">#F44336</color>
 
-    <color name="colorBackground">#FAFAFA</color>
-    <color name="colorOnBackground">#212121</color>
-    <color name="colorSurface">#FFFFFF</color>
-    <color name="colorOnSurface">#212121</color>
-    <color name="colorSurfaceVariant">#F5F5F5</color>
-    <color name="colorOnSurfaceVariant">#757575</color>
-
-    <color name="colorOutline">#BDBDBD</color>
-
-    <!-- Text Colors -->
-    <color name="textColorPrimary">#212121</color>
-    <color name="textColorSecondary">#757575</color>
-    <color name="textColorHint">#9E9E9E</color>
-    <color name="textColorWhite">#FFFFFF</color>
-
-    <!-- Legacy Support -->
-    <color name="colorPrimaryVariant">#0D47A1</color>
-    <color name="colorSecondaryVariant">#BF360C</color>
-    
-    <!-- Missing Colors -->
-    <color name="background_gradient_start">#1976D2</color>
-    <color name="background_gradient_end">#0D47A1</color>
-    <color name="gradient_primary_start">#FF6D00</color>
-    <color name="gradient_primary_end">#BF360C</color>
-    <color name="borders">#E0E0E0</color>
-    <color name="primary_blue">#1976D2</color>
-    <color name="secondary_blue">#42A5F5</color>
-    <color name="text_white">#FFFFFF</color>
-    <color name="error_red">#F44336</color>
-    <color name="background_sections">#F5F5F5</color>
-    <color name="gray_light_bg">#F5F5F5</color>
-    <color name="gray_divider">#E0E0E0</color>
-    <color name="icon_background_light">#E3F2FD</color>
-    <color name="success_green">#4CAF50</color>
-    <color name="udhaarpay_primary">#1976D2</color>
-    <color name="gray_medium_text">#757575</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="textColorSecondary">#A1A1AA</color>
+    <color name="textColorTertiary">#71717A</color>
+    <color name="textColorHint">#52525B</color>
 </resources>

@@ -8,6 +8,7 @@ buildscript {
         // Add JavaPoet to the buildscript classpath so Gradle plugins/workers
         // (like the Hilt aggregate task) can access the expected JavaPoet API.
         classpath("com.squareup:javapoet:1.13.0")
+        classpath("com.google.gms:google-services:4.4.0")
     }
 }
 

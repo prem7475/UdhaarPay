@@ -2,33 +2,24 @@ package com.example.udhaarpay.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.udhaarpay.data.local.dao.BankAccountDao
-import com.example.udhaarpay.data.local.dao.CreditCardDao
-import com.example.udhaarpay.data.local.dao.ExpenseDao
-import com.example.udhaarpay.data.local.dao.TransactionDao
-import com.example.udhaarpay.data.local.dao.UdhariDao
-import com.example.udhaarpay.data.local.dao.UserDao
-import com.example.udhaarpay.data.local.entity.BankAccountEntity
-import com.example.udhaarpay.data.local.entity.CreditCardEntity
-import com.example.udhaarpay.data.local.entity.ExpenseEntity
-import com.example.udhaarpay.data.local.entity.TransactionEntity
-import com.example.udhaarpay.data.local.entity.UdhariRecordEntity
-import com.example.udhaarpay.data.local.entity.UserProfileEntity
+import com.example.udhaarpay.data.local.dao.*
 import com.example.udhaarpay.data.local.entity.WalletEntity
+import com.example.udhaarpay.data.model.*
 
 @Database(
     entities = [
-        TransactionEntity::class,
-        BankAccountEntity::class,
-        CreditCardEntity::class,
-        UdhariRecordEntity::class,
-        UserProfileEntity::class,
-        WalletEntity::class,
-        ExpenseEntity::class
+        Transaction::class,
+        BankAccount::class,
+        CreditCard::class,
+        Udhari::class,
+        User::class,
+        Expense::class,
+        WalletEntity::class
     ],
-    version = 4,
+    version = 1,
     exportSchema = false
 )
+// NO @TypeConverters HERE! (We removed them)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun bankAccountDao(): BankAccountDao
@@ -36,4 +27,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun udhariDao(): UdhariDao
     abstract fun userDao(): UserDao
     abstract fun expenseDao(): ExpenseDao
+    abstract fun walletDao(): WalletDao
 }

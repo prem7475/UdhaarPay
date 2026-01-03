@@ -2,7 +2,6 @@ package com.example.udhaarpay.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(tableName = "bank_accounts")
 data class BankAccount(
@@ -13,19 +12,21 @@ data class BankAccount(
     val ifscCode: String,
     val bankName: String,
     val accountHolderName: String,
-    val accountType: AccountType = AccountType.SAVINGS,
+    
+    // Changed Enum to String to fix Room error
+    val accountType: String = "SAVINGS", 
+    
     val isPrimary: Boolean = false,
     val isVerified: Boolean = false,
     val balance: Double = 0.0,
-    val showBalance: Boolean = true, // Added missing field
-    val lastSyncedAt: Date = Date(),
-    val createdAt: Date = Date(),
+    val showBalance: Boolean = true,
+    
+    // Changed Date -> Long (Timestamp) to fix Room error
+    val lastSyncedAt: Long = System.currentTimeMillis(),
+    val createdAt: Long = System.currentTimeMillis(),
+    
     val isActive: Boolean = true
-)
-
-enum class AccountType {
-    SAVINGS,
-    CURRENT,
-    SALARY,
-    NRI
+) {
+    fun getDisplayName(): String = "$bankName - ${accountNumber.takeLast(4)}"
+    fun getMaskedNumber(): String = "••••...${accountNumber.takeLast(4)}"
 }
