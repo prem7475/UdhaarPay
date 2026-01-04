@@ -5,38 +5,24 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.udhaarpay.data.local.entity.WalletEntity
-import com.example.udhaarpay.data.model.User
+import com.example.udhaarpay.data.model.User // <--- CRITICAL IMPORT
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
-    // Matches the tableName = "user_profile" in User.kt
-    @Query("SELECT * FROM user_profile WHERE userId = :userId")
-    fun getUser(userId: String): Flow<User?>
-
-    @Query("SELECT * FROM user_profile WHERE userId = :userId")
-    suspend fun getUserById(userId: String): User?
-
-    @Query("SELECT * FROM user_profile WHERE userId = :userId")
-    suspend fun getUserProfile(userId: String): User?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: User)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdateProfile(user: User)
-
     @Update
     suspend fun updateUser(user: User)
 
-    @Query("UPDATE user_profile SET walletBalance = :newBalance WHERE userId = :userId")
-    suspend fun updateWalletBalance(userId: String, newBalance: Double)
+    @Query("SELECT * FROM users WHERE userId = :userId")
+    fun getUser(userId: String): Flow<User?>
 
-    // Wallet related methods
-    @Query("SELECT * FROM wallet WHERE id = 1")
-    fun getWallet(): Flow<WalletEntity?>
+    @Query("SELECT * FROM users WHERE userId = :userId")
+    suspend fun getUserOneShot(userId: String): User?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrUpdateWallet(wallet: WalletEntity)
+    @Query("DELETE FROM users")
+    suspend fun clearAll()
 }

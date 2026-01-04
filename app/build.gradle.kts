@@ -58,6 +58,10 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
 
     // Navigation & Icons
+        // ZXing (QR code)
+        implementation("com.google.zxing:core:3.5.3")
+        // Coil (Image loading for Compose)
+        implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.compose.material:material-icons-extended:1.6.3")
 
@@ -70,9 +74,6 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
-    // Standard Hilt
-    implementation("com.google.dagger:hilt-android:2.50")
-    ksp("com.google.dagger:hilt-android-compiler:2.50")
 
     // WorkManager (Required for Configuration.Provider)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
