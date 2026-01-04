@@ -83,6 +83,11 @@ class MainActivity : ComponentActivity() {
                         composable("debt") { DebtScreen() }
                         composable("profile") { ProfileScreen() }
                         composable("wallet_management") { WalletManagementScreen() }
+                        composable("reminders") { RemindersScreen() }
+                        composable("support") { SupportScreen() }
+                        composable("transactions") { TransactionsScreen() }
+                        composable("offers") { OffersScreen() }
+                        composable("scan_pay") { ScanPayScreen() }
                     }
                 }
             }

@@ -1,3 +1,4 @@
+
 package com.udhaarpay.app.ui.screens.scanpay
 
 import android.graphics.Bitmap
@@ -43,4 +44,10 @@ fun ScanPayScreen() {
         }
     }
     // ...existing code...
+}
+
+// Stub for missing QR decode function
+fun decodeQrFromBitmap(bitmap: android.graphics.Bitmap?): String {
+    // TODO: Implement actual QR decoding using ZXing or similar
+    return if (bitmap != null) "QR code detected (mock)" else "Failed to decode QR"
 }
