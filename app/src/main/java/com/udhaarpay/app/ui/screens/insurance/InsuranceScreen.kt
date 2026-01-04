@@ -29,17 +29,29 @@ fun InsuranceScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF9FAFB))
-            .padding(16.dp)
+            .background(Color(0xFF0F172A))
+            .padding(20.dp)
     ) {
-        Text("Your Policies", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        LazyColumn {
+        Text("Your Policies", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color.White)
+        Spacer(Modifier.height(10.dp))
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             items(mockPolicies) { policy ->
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                    elevation = CardDefaults.cardElevation(6.dp)
                 ) {
-                    // ...existing code...
+                    Row(
+                        Modifier.padding(18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(policy.type, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
+                            Text("Coverage: ${policy.coverage}", fontSize = 14.sp, color = Color(0xFF22C55E))
+                            Text("Expiry: ${policy.expiry}", fontSize = 13.sp, color = Color(0xFFCBD5E1))
+                        }
+                        Text(policy.status, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = if (policy.status == "Active") Color(0xFF22C55E) else Color(0xFFDC2626))
+                    }
                 }
             }
         }

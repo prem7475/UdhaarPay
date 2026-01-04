@@ -26,20 +26,26 @@ fun OffersScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF9FAFB))
-            .padding(16.dp)
+            .background(Color(0xFF0F172A))
+            .padding(20.dp)
     ) {
         Text("Offers & Rewards", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFFF59E0B))
         Spacer(Modifier.height(12.dp))
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             items(mockOffers) { offer ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
+                    elevation = CardDefaults.cardElevation(6.dp)
                 ) {
-                    // ...existing code...
+                    Column(Modifier.padding(18.dp)) {
+                        Text(offer.title, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
+                        Text(offer.description, fontSize = 14.sp, color = Color(0xFFCBD5E1))
+                        Text(offer.validity, fontSize = 13.sp, color = Color(0xFFF59E0B), modifier = Modifier.padding(top = 4.dp))
+                    }
                 }
             }
         }

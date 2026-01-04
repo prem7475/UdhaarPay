@@ -3,7 +3,7 @@ package com.udhaarpay.app.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.udhaarpay.app.data.local.dao.CreditCardDao
-import com.udhaarpay.app.data.model.CreditCard
+import com.udhaarpay.app.data.local.entities.CreditCard
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

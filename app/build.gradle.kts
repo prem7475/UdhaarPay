@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.compose.compiler) 
     id("com.google.devtools.ksp") 
     id("com.google.dagger.hilt.android")
+    id("androidx.room") version "2.7.0"
 }
 
 android {
@@ -44,6 +45,10 @@ android {
     }
     // 2. REMOVED: composeOptions { kotlinCompilerExtensionVersion = ... } 
     // This block is deleted because the new plugin handles it automatically.
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 dependencies {

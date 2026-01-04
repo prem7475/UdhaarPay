@@ -1,4 +1,3 @@
-
 package com.udhaarpay.app
 
 import com.udhaarpay.app.ui.screens.support.SupportScreen
@@ -17,6 +16,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateDpAsState
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.CreditCard
@@ -26,10 +35,8 @@ import androidx.compose.material.icons.filled.LocalOffer
 import androidx.compose.material.icons.filled.SendToMobile
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.PhonelinkSetup
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -55,21 +62,223 @@ import com.udhaarpay.app.ui.screens.debt.DebtScreen
 import com.udhaarpay.app.ui.screens.profile.ProfileScreen
 import com.udhaarpay.app.ui.screens.wallet.WalletManagementScreen
 
+@Composable
+fun UdhaarPayAmexTheme(content: @Composable () -> Unit) {
+    val AmexBlue = Color(0xFF016FD0)
+    val AmexBlueDark = Color(0xFF003366)
+    val AmexGradient = Brush.verticalGradient(listOf(AmexBlue, AmexBlueDark))
+    val AmexAccent = Color(0xFF00C6D7)
+    val AmexSurface = Color(0xFF112244)
+    val AmexCard = Color(0xFF1A2A4C)
+    val AmexOutline = Color(0xFF3B82F6)
+    val amexColors = darkColorScheme(
+        primary = AmexBlue,
+        onPrimary = Color.White,
+        secondary = AmexAccent,
+        onSecondary = Color.White,
+        background = AmexBlueDark,
+        onBackground = Color.White,
+        surface = AmexSurface,
+        onSurface = Color.White,
+        surfaceVariant = AmexCard,
+        onSurfaceVariant = Color(0xFFCBD5E1),
+        outline = AmexOutline
+    )
+    MaterialTheme(
+        colorScheme = amexColors,
+        typography = Typography(),
+        content = content
+    )
+}
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
         enableEdgeToEdge()
-        
         setContent {
-            MaterialTheme {
-                val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            MainAppContent()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MainAppContent() {
+    UdhaarPayAmexTheme {
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
+        val navController = rememberNavController()
+        var selectedTab by remember { mutableStateOf(0) }
+        val tabs = listOf(
+            "Home", "Invest", "Pay", "History", "Profile"
+        )
+        val tabRoutes = listOf(
+            "dashboard", "investments", "scan_pay", "transactions", "profile"
+        )
+        val drawerAnimProgress = animateFloatAsState(
+            if (drawerState.isOpen) 1f else 0f,
+            label = "drawerAnim"
+        )
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                Box(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            scaleX = 0.95f + 0.05f * drawerAnimProgress.value
+                            scaleY = 0.95f + 0.05f * drawerAnimProgress.value
+                            alpha = 0.7f + 0.3f * drawerAnimProgress.value
+                            shadowElevation = 24f * drawerAnimProgress.value
+                        }
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(290.dp)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    listOf(Color(0xFF016FD0), Color(0xFF003366))
+                                )
+                            )
+                            .padding(top = 48.dp, start = 18.dp, end = 18.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        // User Info
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Surface(
+                                shape = CircleShape,
+                                color = Color(0xFF00C6D7),
+                                border = BorderStroke(2.dp, Color.White),
+                                modifier = Modifier.size(56.dp)
+                            ) {
+                                // Placeholder for user photo
+                                Box(Modifier.fillMaxSize())
+                            }
+                            Spacer(Modifier.width(14.dp))
+                            Column {
+                                Text("Amit Sharma", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+                                Text("amit.sharma@email.com", fontSize = 13.sp, color = Color(0xFFB6E6F7))
+                            }
+                        }
+                        Spacer(Modifier.height(32.dp))
+                        val drawerItems = listOf(
+                            "Dashboard" to "dashboard",
+                            "Investments" to "investments",
+                            "Credit Cards" to "credit_card",
+                            "Bank Accounts" to "bank_accounts",
+                            "Insurance" to "insurance",
+                            "Debt" to "debt",
+                            "Profile" to "profile",
+                            "Wallets" to "wallet_management",
+                            "Reminders" to "reminders",
+                            "Support" to "support",
+                            "Transactions" to "transactions",
+                            "Offers" to "offers",
+                            "Scan & Pay" to "scan_pay"
+                        )
+                        drawerItems.forEach { (label, route) ->
+                            Text(
+                                label,
+                                fontSize = 16.sp,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 10.dp, horizontal = 8.dp)
+                                    .background(
+                                        color = Color.Transparent,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .clickable {
+                                        navController.navigate(route) {
+                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
+                                        scope.launch { drawerState.close() }
+                                    }
+                            )
+                        }
+                    }
+                }
+            },
+        ) {
+            val topBarElevation = animateDpAsState(
+                if (drawerState.isOpen) 16.dp else 8.dp,
+                label = "topBarElevation"
+            )
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                topBar = {
+                    SmallTopAppBar(
+                        title = {
+                            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                                Text(
+                                    "UdhaarPay",
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp,
+                                    letterSpacing = 2.sp
+                                )
+                            }
+                        },
+                        navigationIcon = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                                    Icon(Icons.Default.Menu, contentDescription = "Menu", tint = Color.White)
+                                }
+                                Surface(
+                                    shape = CircleShape,
+                                    color = Color(0xFF1E293B),
+                                    border = BorderStroke(2.dp, Color(0xFF6366F1)),
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Box(Modifier.fillMaxSize())
+                                }
+                            }
+                        },
+                        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+                        modifier = Modifier.shadow(topBarElevation.value, RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp), clip = false)
+                    )
+                },
+                bottomBar = {
+                    NavigationBar(containerColor = Color.White, tonalElevation = 8.dp) {
+                        tabs.forEachIndexed { idx, label ->
+                            NavigationBarItem(
+                                selected = selectedTab == idx,
+                                onClick = {
+                                    selectedTab = idx
+                                    navController.navigate(tabRoutes[idx]) {
+                                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                                icon = {
+                                    when (label) {
+                                        "Home" -> Icon(Icons.Default.AccountBalance, contentDescription = "Home")
+                                        "Invest" -> Icon(Icons.Default.CreditCard, contentDescription = "Invest")
+                                        "Pay" -> Icon(Icons.Default.Payment, contentDescription = "Pay")
+                                        "History" -> Icon(Icons.Default.LocalAtm, contentDescription = "History")
+                                        "Profile" -> Icon(Icons.Default.Group, contentDescription = "Profile")
+                                        else -> Icon(Icons.Default.AccountBalance, contentDescription = label)
+                                    }
+                                },
+                                label = { Text(label) }
+                            )
+                        }
+                    }
+                }
+            ) { innerPadding ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding),
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     NavHost(
                         navController = navController,
                         startDestination = "dashboard",
-                        modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("dashboard") {
                             UdhaarPayDashboard(
@@ -105,6 +314,7 @@ data class PaymentOption(
 
 @Composable
 fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Unit) {
+    // Modern card-based dashboard layout
     val paymentOptions = listOf(
         PaymentOption(
             "investments",
@@ -170,34 +380,6 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
             Color(0xFFEC4899)
         ),
         PaymentOption(
-            "groups",
-            "Split Expenses",
-            "Group payments & splitting",
-            Icons.Default.Group,
-            Color(0xFF8B5CF6)
-        ),
-        PaymentOption(
-            "bank_accounts",
-            "Bank Accounts",
-            "View and manage bank accounts",
-            Icons.Default.AccountBalance,
-            Color(0xFF0EA5E9)
-        ),
-        PaymentOption(
-            "insurance",
-            "Insurance",
-            "View and buy insurance policies",
-            Icons.Default.LocalOffer,
-            Color(0xFF6366F1)
-        ),
-        PaymentOption(
-            "debt",
-            "Debt",
-            "View and pay debts",
-            Icons.Default.Payment,
-            Color(0xFFDC2626)
-        ),
-        PaymentOption(
             "profile",
             "Profile",
             "View and edit your profile",
@@ -244,68 +426,69 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFF0F172A))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         // Header
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = Color(0xFF1E293B),
-                    shape = RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp)
-                )
-                .padding(24.dp)
+        Surface(
+            tonalElevation = 4.dp,
+            shape = RoundedCornerShape(bottomEnd = 32.dp, bottomStart = 32.dp),
+            color = MaterialTheme.colorScheme.primary
         ) {
-            Text(
-                "UdhaarPay",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                "Your Digital Payment Solution",
-                fontSize = 14.sp,
-                color = Color(0xFFCBD5E1),
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            // Wallet Balance
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        color = Color(0xFF0F172A),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                    .padding(16.dp)
-                    .padding(top = 16.dp)
+                    .padding(28.dp)
             ) {
-                Column {
-                    Text(
-                        "Wallet Balance",
-                        fontSize = 12.sp,
-                        color = Color(0xFF94A3B8)
-                    )
-                    Text(
-                        "₹5,450.00",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                Text(
+                    "UdhaarPay",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    "Your Digital Payment Solution",
+                    fontSize = 15.sp,
+                    color = Color(0xFFD1D5DB),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                // Wallet Balance
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shadowElevation = 6.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 18.dp)
+                ) {
+                    Column(Modifier.padding(20.dp)) {
+                        Text(
+                            "Wallet Balance",
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            "₹5,450.00",
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
                 }
             }
         }
         // Payment Options Grid
+        Spacer(Modifier.height(18.dp))
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(paymentOptions.chunked(2)) { rowItems ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     rowItems.forEach { option ->
                         PaymentOptionCard(
@@ -313,7 +496,6 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
                             modifier = Modifier
                                 .weight(1f)
                                 .clickable {
-                                    // Navigate to the appropriate screen
                                     when (option.id) {
                                         "investments" -> onNavigate("investments")
                                         "scan_pay" -> onNavigate("scan_pay")
@@ -332,7 +514,6 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
                                 }
                         )
                     }
-                    // Add spacer for odd number of items
                     if (rowItems.size == 1) {
                         Spacer(modifier = Modifier.weight(1f))
                     }
@@ -347,38 +528,38 @@ fun PaymentOptionCard(
     option: PaymentOption,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .background(
-                color = Color(0xFF1E293B),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        shadowElevation = 8.dp,
+        tonalElevation = 2.dp,
+        color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp, horizontal = 8.dp)
         ) {
             Icon(
                 imageVector = option.icon,
                 contentDescription = option.title,
                 tint = option.color,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(38.dp)
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 option.title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color.White,
                 maxLines = 1
             )
             Text(
                 option.description,
-                fontSize = 11.sp,
-                color = Color(0xFF94A3B8),
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 2,
                 modifier = Modifier.padding(top = 4.dp)
             )
