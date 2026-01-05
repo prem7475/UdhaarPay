@@ -23,7 +23,6 @@ data class Debt(val type: String, val status: String, val amount: String, val du
 @Composable
 fun DebtScreen() {
     var showPay by remember { mutableStateOf(false) }
-    var showConfirm by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()

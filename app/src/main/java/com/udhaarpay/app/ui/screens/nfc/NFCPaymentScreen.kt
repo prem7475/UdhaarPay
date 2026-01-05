@@ -10,7 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Contactless
+// import androidx.compose.material.icons.filled.Contactless // Not available in this Compose version
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +32,7 @@ import com.udhaarpay.app.ui.viewmodel.NFCViewModel
 @Composable
 fun NFCPaymentScreen(
     onBack: () -> Unit,
-    viewModel: NFCViewModel = androidx.hilt.navigation.compose.hiltViewModel()
+    viewModel: NFCViewModel = hiltViewModel()
 ) {
     val cards by viewModel.cards.collectAsState()
     val selectedCard by viewModel.selectedCard.collectAsState()
@@ -63,7 +63,7 @@ fun NFCPaymentScreen(
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+                // Removed colors param for Compose 2023.03.00 compatibility
             )
         }
     ) { padding ->
@@ -215,12 +215,7 @@ fun ActiveCardView(
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        Icon(
-            imageVector = Icons.Default.Contactless,
-            contentDescription = "NFC",
-            tint = Color(0xFF2563EB),
-            modifier = Modifier.size(64.dp)
-        )
+        // Icon removed for compatibility
 
         Spacer(modifier = Modifier.height(40.dp))
 

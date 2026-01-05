@@ -2,8 +2,8 @@ package com.udhaarpay.app.ui.screens.bankaccounts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.udhaarpay.data.local.dao.BankAccountDao
-import com.example.udhaarpay.data.model.BankAccount
+import com.udhaarpay.app.data.local.dao.BankAccountDao
+import com.udhaarpay.app.data.local.entities.BankAccount
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

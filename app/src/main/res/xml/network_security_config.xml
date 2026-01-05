@@ -5,9 +5,4 @@
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">api.udhaarpay.com</domain>
     </domain-config>
-
-    <!-- Certificate pinning for production -->
-    <pin-set>
-        <pin digest="SHA-256">your_certificate_pin_here</pin>
-    </pin-set>
 </network-security-config>

@@ -38,8 +38,6 @@ val mockCards = listOf(
 
 @Composable
 fun CreditCardScreen() {
-    var showApply by remember { mutableStateOf(false) }
-    var showConfirm by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()

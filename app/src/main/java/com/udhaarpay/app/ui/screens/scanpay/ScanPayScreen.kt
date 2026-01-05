@@ -10,7 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Contactless
+// import androidx.compose.material.icons.filled.Contactless
 import androidx.compose.material3.*
 import androidx.compose.ui.window.Dialog
 import com.udhaarpay.app.ui.screens.nfc.NFCPaymentScreen
@@ -24,6 +24,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.udhaarpay.app.ui.viewmodel.NFCViewModel
 
 import coil.compose.rememberAsyncImagePainter
 import com.google.zxing.BarcodeFormat
@@ -69,7 +71,7 @@ fun ScanPayScreen() {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2563EB))
         ) {
-            Icon(Icons.Default.Contactless, contentDescription = "NFC", tint = Color.White)
+            // Icon removed for compatibility
             Spacer(Modifier.width(8.dp))
             Text("Pay with NFC", color = Color.White)
         }
@@ -80,6 +82,7 @@ fun ScanPayScreen() {
     }
 
     if (showNfcDialog) {
+        val nfcViewModel: NFCViewModel = hiltViewModel()
         Dialog(onDismissRequest = { showNfcDialog = false }) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
@@ -87,7 +90,7 @@ fun ScanPayScreen() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 Box(Modifier.sizeIn(minWidth = 340.dp, minHeight = 480.dp)) {
-                    NFCPaymentScreen(onBack = { showNfcDialog = false })
+                    NFCPaymentScreen(onBack = { showNfcDialog = false }, viewModel = nfcViewModel)
                 }
             }
         }

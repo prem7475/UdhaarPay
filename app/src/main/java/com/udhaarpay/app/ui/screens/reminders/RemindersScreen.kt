@@ -23,7 +23,7 @@ val mockReminders = listOf(
 data class Reminder(val title: String, val amount: String, val dueDate: String, val paid: Boolean)
 
 @Composable
-fun RemindersScreen(content: @Composable () -> Unit = {}) {
+fun RemindersScreen() {
     var reminders by remember { mutableStateOf(mockReminders) }
     Column(
         modifier = Modifier

@@ -23,9 +23,6 @@ data class Policy(val type: String, val status: String, val coverage: String, va
 
 @Composable
 fun InsuranceScreen() {
-    var selectedType by remember { mutableStateOf<String?>(null) }
-    var showBuy by remember { mutableStateOf(false) }
-    var showConfirm by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()

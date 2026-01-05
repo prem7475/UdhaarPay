@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen() {
     var showEdit by remember { mutableStateOf(false) }
@@ -96,12 +97,6 @@ fun ProfileScreen() {
                             onValueChange = { name = it },
                             label = { Text("Name", color = Color(0xFFCBD5E1)) },
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF6366F1),
-                                unfocusedBorderColor = Color(0xFF334155),
-                                focusedTextColor = Color.White,
-                                cursorColor = Color(0xFF6366F1)
-                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(Modifier.height(10.dp))
@@ -110,12 +105,6 @@ fun ProfileScreen() {
                             onValueChange = { email = it },
                             label = { Text("Email", color = Color(0xFFCBD5E1)) },
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF6366F1),
-                                unfocusedBorderColor = Color(0xFF334155),
-                                focusedTextColor = Color.White,
-                                cursorColor = Color(0xFF6366F1)
-                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(Modifier.height(10.dp))
@@ -124,12 +113,6 @@ fun ProfileScreen() {
                             onValueChange = { phone = it },
                             label = { Text("Phone", color = Color(0xFFCBD5E1)) },
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF6366F1),
-                                unfocusedBorderColor = Color(0xFF334155),
-                                focusedTextColor = Color.White,
-                                cursorColor = Color(0xFF6366F1)
-                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(Modifier.height(10.dp))
@@ -138,12 +121,6 @@ fun ProfileScreen() {
                             onValueChange = { address = it },
                             label = { Text("Address", color = Color(0xFFCBD5E1)) },
                             singleLine = true,
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF6366F1),
-                                unfocusedBorderColor = Color(0xFF334155),
-                                focusedTextColor = Color.White,
-                                cursorColor = Color(0xFF6366F1)
-                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(Modifier.height(22.dp))

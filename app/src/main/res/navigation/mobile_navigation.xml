@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/splash_fragment"
-        android:name="com.example.udhaarpay.ui.auth.SplashFragment"
+        android:name="com.udhaarpay.app.ui.auth.SplashFragment"
         android:label="SplashFragment"
         tools:layout="@layout/fragment_splash">
         <action
@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/login_fragment"
-        android:name="com.example.udhaarpay.ui.auth.LoginFragment"
+        android:name="com.udhaarpay.app.ui.auth.LoginFragment"
         android:label="LoginFragment"
         tools:layout="@layout/fragment_login">
         <action
@@ -34,7 +34,7 @@
 
     <fragment
         android:id="@+id/otp_fragment"
-        android:name="com.example.udhaarpay.ui.auth.OtpFragment"
+        android:name="com.udhaarpay.app.ui.auth.OtpFragment"
         android:label="OtpFragment"
         tools:layout="@layout/fragment_otp">
         <action
@@ -46,7 +46,7 @@
 
     <fragment
         android:id="@+id/profile_setup_fragment"
-        android:name="com.example.udhaarpay.ui.auth.ProfileSetupFragment"
+        android:name="com.udhaarpay.app.ui.auth.ProfileSetupFragment"
         android:label="ProfileSetupFragment"
         tools:layout="@layout/fragment_profile_setup">
         <action
@@ -58,13 +58,13 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.udhaarpay.ui.dashboard.HomeFragment"
+        android:name="com.udhaarpay.app.ui.dashboard.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" />
         
     <fragment
         android:id="@+id/nav_bank"
-        android:name="com.example.udhaarpay.BankFragmentKt"
+        android:name="com.udhaarpay.app.BankFragmentKt"
         android:label="@string/nav_bank"
         tools:layout="@layout/fragment_bank" >
         <action
@@ -74,43 +74,43 @@
     
     <fragment
         android:id="@+id/selectBankFragment"
-        android:name="com.example.udhaarpay.ui.account.SelectBankFragment"
+        android:name="com.udhaarpay.app.ui.account.SelectBankFragment"
         android:label="Select Bank"
         tools:layout="@layout/fragment_select_bank" />
 
     <fragment
         android:id="@+id/nav_edit_profile"
-        android:name="com.example.udhaarpay.ui.profile.EditProfileFragment"
+        android:name="com.udhaarpay.app.ui.profile.EditProfileFragment"
         android:label="Edit Profile"
         tools:layout="@layout/fragment_edit_profile" />
 
     <fragment
         android:id="@+id/nav_scan_pay"
-        android:name="com.example.udhaarpay.ui.scan.ScanPayFragment"
+        android:name="com.udhaarpay.app.ui.scan.ScanPayFragment"
         android:label="Scan &amp; Pay"
         tools:layout="@layout/fragment_scan_pay" />
 
     <fragment
         android:id="@+id/nav_transaction_history"
-        android:name="com.example.udhaarpay.ui.transactions.TransactionHistoryFragment"
+        android:name="com.udhaarpay.app.ui.transactions.TransactionHistoryFragment"
         android:label="Transaction History"
         tools:layout="@layout/fragment_transaction_history" />
 
     <fragment
         android:id="@+id/nav_add_bank_account"
-        android:name="com.example.udhaarpay.ui.accounts.AddBankAccountFragment"
+        android:name="com.udhaarpay.app.ui.accounts.AddBankAccountFragment"
         android:label="Add Bank Account"
         tools:layout="@layout/fragment_add_bank_account" />
 
     <fragment
         android:id="@+id/nav_add_credit_card"
-        android:name="com.example.udhaarpay.ui.accounts.AddCreditCardFragment"
+        android:name="com.udhaarpay.app.ui.accounts.AddCreditCardFragment"
         android:label="Add Credit Card"
         tools:layout="@layout/fragment_add_credit_card" />
 
     <fragment
         android:id="@+id/nav_apply_for_card"
-        android:name="com.example.udhaarpay.ui.cards.ApplyForCardFragment"
+        android:name="com.udhaarpay.app.ui.cards.ApplyForCardFragment"
         android:label="Apply for New Card"
         tools:layout="@layout/fragment_apply_for_card" />
 

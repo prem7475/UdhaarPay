@@ -16,11 +16,11 @@ sealed class InvestmentRoute(val route: String) {
 @Composable
 fun InvestmentsNavHost(navController: NavHostController = rememberNavController(), startDestination: String = InvestmentRoute.Investment.route) {
     NavHost(navController = navController, startDestination = startDestination) {
-        addInvestmentNavGraph(navController)
+        addInvestmentNavGraph()
     }
 }
 
-fun NavGraphBuilder.addInvestmentNavGraph(navController: NavHostController) {
+fun NavGraphBuilder.addInvestmentNavGraph() {
     composable(InvestmentRoute.Investment.route) {
         InvestmentScreen()
     }

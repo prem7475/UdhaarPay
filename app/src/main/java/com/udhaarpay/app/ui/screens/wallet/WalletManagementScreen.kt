@@ -22,9 +22,6 @@ data class Wallet(val name: String, val balance: String, val isDefault: Boolean)
 
 @Composable
 fun WalletManagementScreen() {
-    var showAdd by remember { mutableStateOf(false) }
-    var showConfirm by remember { mutableStateOf(false) }
-    var showSetDefault by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()

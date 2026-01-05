@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.udhaarpay.app.data.local.AppDatabase
 import com.udhaarpay.app.data.local.dao.CreditCardDao
+import com.udhaarpay.app.data.local.dao.BankAccountDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,8 +26,13 @@ object DatabaseModule {
         ).build()
     }
 
-    @Provides
+   @Provides
     fun provideCreditCardDao(appDatabase: AppDatabase): CreditCardDao {
         return appDatabase.creditCardDao()
+    }
+
+    @Provides
+    fun provideBankAccountDao(appDatabase: AppDatabase): BankAccountDao {
+        return appDatabase.bankAccountDao()
     }
 }

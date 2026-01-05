@@ -9,7 +9,7 @@ import com.udhaarpay.app.ui.screens.scanpay.ScanPayScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+// enableEdgeToEdge is not available in this Compose/AndroidX version
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,14 +27,10 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.LocalAtm
-import androidx.compose.material.icons.filled.LocalOffer
-import androidx.compose.material.icons.filled.SendToMobile
-import androidx.compose.material.icons.filled.Payment
-import androidx.compose.material.icons.filled.PhonelinkSetup
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.runtime.Composable
@@ -66,7 +62,6 @@ import com.udhaarpay.app.ui.screens.wallet.WalletManagementScreen
 fun UdhaarPayAmexTheme(content: @Composable () -> Unit) {
     val AmexBlue = Color(0xFF016FD0)
     val AmexBlueDark = Color(0xFF003366)
-    val AmexGradient = Brush.verticalGradient(listOf(AmexBlue, AmexBlueDark))
     val AmexAccent = Color(0xFF00C6D7)
     val AmexSurface = Color(0xFF112244)
     val AmexCard = Color(0xFF1A2A4C)
@@ -95,7 +90,7 @@ fun UdhaarPayAmexTheme(content: @Composable () -> Unit) {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Removed enableEdgeToEdge for compatibility
         setContent {
             MainAppContent()
         }
@@ -210,7 +205,7 @@ fun MainAppContent() {
             Scaffold(
                 modifier = Modifier.fillMaxSize(),
                 topBar = {
-                    SmallTopAppBar(
+                    TopAppBar(
                         title = {
                             Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                                 Text(
@@ -237,7 +232,7 @@ fun MainAppContent() {
                                 }
                             }
                         },
-                        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary),
+                        // Removed colors param for Compose 2023.03.00 compatibility
                         modifier = Modifier.shadow(topBarElevation.value, RoundedCornerShape(bottomEnd = 24.dp, bottomStart = 24.dp), clip = false)
                     )
                 },
@@ -256,12 +251,12 @@ fun MainAppContent() {
                                 },
                                 icon = {
                                     when (label) {
-                                        "Home" -> Icon(Icons.Default.AccountBalance, contentDescription = "Home")
-                                        "Invest" -> Icon(Icons.Default.CreditCard, contentDescription = "Invest")
-                                        "Pay" -> Icon(Icons.Default.Payment, contentDescription = "Pay")
-                                        "History" -> Icon(Icons.Default.LocalAtm, contentDescription = "History")
-                                        "Profile" -> Icon(Icons.Default.Group, contentDescription = "Profile")
-                                        else -> Icon(Icons.Default.AccountBalance, contentDescription = label)
+                                        "Home" -> Icon(Icons.Default.Home, contentDescription = "Home")
+                                        "Invest" -> Icon(Icons.Default.Person, contentDescription = "Invest")
+                                        "Pay" -> Icon(Icons.Default.Settings, contentDescription = "Pay")
+                                        "History" -> Icon(Icons.Default.Info, contentDescription = "History")
+                                        "Profile" -> Icon(Icons.Default.Person, contentDescription = "Profile")
+                                        else -> Icon(Icons.Default.Home, contentDescription = label)
                                     }
                                 },
                                 label = { Text(label) }
@@ -320,105 +315,105 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
             "investments",
             "Investments",
             "Manage and invest in assets",
-            Icons.Default.AccountBalance,
+            Icons.Default.Home,
             Color(0xFF22C55E)
         ),
         PaymentOption(
             "scan_pay",
             "Scan & Pay",
             "Scan QR or add from gallery",
-            Icons.Default.Payment,
+            Icons.Default.Settings,
             Color(0xFF2563EB)
         ),
         PaymentOption(
             "send_money",
             "Send Money",
             "Transfer funds to friends & family",
-            Icons.Default.SendToMobile,
+            Icons.Default.Person,
             Color(0xFF2563EB)
         ),
         PaymentOption(
             "request_money",
             "Request Money",
             "Ask for payment from others",
-            Icons.Default.AccountBalance,
+            Icons.Default.Home,
             Color(0xFF7C3AED)
         ),
         PaymentOption(
             "add_money",
             "Add Money",
             "Load funds to your wallet",
-            Icons.Default.LocalAtm,
+            Icons.Default.Info,
             Color(0xFF059669)
         ),
         PaymentOption(
             "pay_bills",
             "Pay Bills",
             "Pay utilities & other services",
-            Icons.Default.Payment,
+            Icons.Default.Settings,
             Color(0xFFDC2626)
         ),
         PaymentOption(
             "mobile_recharge",
             "Mobile Recharge",
             "Recharge mobile & data plans",
-            Icons.Default.PhonelinkSetup,
+            Icons.Default.Settings,
             Color(0xFFF59E0B)
         ),
         PaymentOption(
             "cashback",
             "Cashback Offers",
             "View available cashback deals",
-            Icons.Default.LocalOffer,
+            Icons.Default.Info,
             Color(0xFF06B6D4)
         ),
         PaymentOption(
             "credit_card",
             "Credit Card",
             "Manage your credit cards",
-            Icons.Default.CreditCard,
+            Icons.Default.Person,
             Color(0xFFEC4899)
         ),
         PaymentOption(
             "profile",
             "Profile",
             "View and edit your profile",
-            Icons.Default.Group,
+            Icons.Default.Person,
             Color(0xFF7C3AED)
         ),
         PaymentOption(
             "wallet_management",
             "Wallets",
             "Manage multiple wallets",
-            Icons.Default.LocalAtm,
+            Icons.Default.Info,
             Color(0xFF059669)
         ),
         PaymentOption(
             "transactions",
             "Transactions",
             "View all your transaction history",
-            Icons.Default.Payment,
+            Icons.Default.Settings,
             Color(0xFF0EA5E9)
         ),
         PaymentOption(
             "offers",
             "Offers",
             "Latest offers and rewards",
-            Icons.Default.LocalOffer,
+            Icons.Default.Info,
             Color(0xFFF59E0B)
         ),
         PaymentOption(
             "reminders",
             "Bill Reminders",
             "Never miss a bill payment",
-            Icons.Default.PhonelinkSetup,
+            Icons.Default.Settings,
             Color(0xFF6366F1)
         ),
         PaymentOption(
             "support",
             "Support",
             "Get help & support",
-            Icons.Default.Group,
+            Icons.Default.Person,
             Color(0xFFDC2626)
         )
     )
