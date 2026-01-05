@@ -21,53 +21,94 @@ data class Debt(val type: String, val status: String, val amount: String, val du
 
 @Composable
 fun DebtScreen() {
-    var showPay by remember { mutableStateOf(false) }
+    var showPay by remember { mutableStateOf<Debt?>(null) }
     var showConfirm by remember { mutableStateOf(false) }
+    var paidDebt by remember { mutableStateOf<Debt?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF9FAFB))
-            .padding(16.dp)
+            .background(Color(0xFFEEF2F7))
+            .padding(18.dp)
     ) {
-        Text("Your Debts", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-        LazyColumn {
+        Text("Your Debts", fontWeight = FontWeight.Bold, fontSize = 24.sp, color = Color(0xFF1E293B))
+        Spacer(Modifier.height(10.dp))
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2563EB)),
+            elevation = CardDefaults.cardElevation(8.dp)
+        ) {
+            Row(
+                Modifier.padding(vertical = 18.dp, horizontal = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Total Outstanding", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                Spacer(Modifier.weight(1f))
+                val total = mockDebts.sumOf { it.amount.replace("₹", "").replace(",", "").toDoubleOrNull() ?: 0.0 }
+                Text("₹" + "%,.0f".format(total), fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color.White)
+            }
+        }
+        Spacer(Modifier.height(18.dp))
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items(mockDebts) { debt ->
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(4.dp)
                 ) {
-                    Column(Modifier.padding(12.dp)) {
-                        Text(debt.type, fontWeight = FontWeight.Bold)
-                        Text("Status: ${debt.status}")
-                        Text("Amount: ${debt.amount}")
-                        Text("Due: ${debt.dueDate}")
-                        if (debt.status != "Paid") {
-                            Button(onClick = { showPay = true }, modifier = Modifier.padding(top = 8.dp)) { Text("Pay Now") }
+                    Row(
+                        Modifier.padding(18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            Text(debt.type, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1E293B))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                val statusColor = when (debt.status) {
+                                    "Active" -> Color(0xFF2563EB)
+                                    "Overdue" -> Color(0xFFEF4444)
+                                    "Paid" -> Color(0xFF22C55E)
+                                    else -> Color.Gray
+                                }
+                                Text("Status: ", color = Color(0xFF64748B), fontSize = 14.sp)
+                                Text(debt.status, color = statusColor, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
+                            Text("Due: ${debt.dueDate}", color = Color(0xFF64748B), fontSize = 14.sp)
+                        }
+                        Column(horizontalAlignment = Alignment.End) {
+                            Text(debt.amount, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF2563EB))
+                            if (debt.status != "Paid") {
+                                Button(
+                                    onClick = { showPay = debt },
+                                    modifier = Modifier.padding(top = 8.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669))
+                                ) { Text("Pay Now", color = Color.White) }
+                            } else {
+                                Text("Paid", color = Color(0xFF22C55E), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            }
                         }
                     }
                 }
             }
         }
-        if (showPay) {
+        if (showPay != null) {
             AlertDialog(
-                onDismissRequest = { showPay = false },
+                onDismissRequest = { showPay = null },
                 title = { Text("Pay Debt") },
-                text = { Text("Pay your outstanding debt now?") },
+                text = { Text("Pay your outstanding debt of ${showPay?.amount} for ${showPay?.type}?") },
                 confirmButton = {
                     TextButton(onClick = {
+                        paidDebt = showPay
                         showConfirm = true
-                        showPay = false
+                        showPay = null
                     }) { Text("Pay") }
                 },
-                dismissButton = { TextButton(onClick = { showPay = false }) { Text("Cancel") } }
+                dismissButton = { TextButton(onClick = { showPay = null }) { Text("Cancel") } }
             )
         }
-        if (showConfirm) {
+        if (showConfirm && paidDebt != null) {
             AlertDialog(
                 onDismissRequest = { showConfirm = false },
                 title = { Text("Payment Successful") },
-                text = { Text("Your debt payment has been processed.") },
+                text = { Text("Your payment for ${paidDebt?.type} has been processed.") },
                 confirmButton = { TextButton(onClick = { showConfirm = false }) { Text("OK") } }
             )
         }

@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.udhaarpay.app.data.model.CreditCard
+import com.udhaarpay.app.data.local.entities.CreditCard
 import com.udhaarpay.app.ui.viewmodel.NFCViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -237,7 +237,7 @@ fun NFCCardItem(
     showDetails: Boolean = false
 ) {
     // Card Background Gradient
-    val isRupay = card.cardType == "RUPAY"
+    val isRupay = card.cardHolderName.contains("Rupay", ignoreCase = true)
 
     val gradient = Brush.linearGradient(
         colors = if (isRupay)
@@ -265,7 +265,7 @@ fun NFCCardItem(
             ) {
                 // Bank Name
                 Text(
-                    text = card.issuerBank,
+                    text = card.cardHolderName,
                     color = Color.White,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
@@ -286,7 +286,7 @@ fun NFCCardItem(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = "•••• •••• •••• ${card.lastFourDigits}",
+                        text = "•••• •••• •••• ${card.cardNumber.takeLast(4)}",
                         color = Color.White,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
@@ -294,22 +294,13 @@ fun NFCCardItem(
 
                     if (showDetails) {
                         Text(
-                            text = "${card.expiryMonth}/${card.expiryYear % 100}",
+                            text = card.expiryDate,
                             color = Color.White.copy(alpha = 0.8f),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             }
-
-            // Network Logo (Placeholder)
-            Text(
-                text = card.cardType,
-                color = Color.White.copy(alpha = 0.6f),
-                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                fontWeight = FontWeight.Black,
-                modifier = Modifier.align(Alignment.TopEnd)
-            )
         }
     }
 }

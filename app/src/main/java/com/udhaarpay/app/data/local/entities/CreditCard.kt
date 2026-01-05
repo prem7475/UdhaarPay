@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey
 data class CreditCard(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val userId: String,
     val cardNumber: String,
     val cardHolderName: String,
     val expiryDate: String,
-    val cvv: String,
-    val userId: String
+    val cvv: String
 )

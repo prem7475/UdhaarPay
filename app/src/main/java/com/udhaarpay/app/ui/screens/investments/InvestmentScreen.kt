@@ -54,14 +54,14 @@ fun InvestmentScreen() {
         Text("Explore Investment Options", fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = Color.White, modifier = Modifier.align(Alignment.Start))
         Spacer(Modifier.height(10.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            /*InvestmentOptionCard(title = "Bonds", desc = "Safe, fixed returns", onClick = { TODO })
-            InvestmentOptionCard(title = "Stocks", desc = "High growth potential", onClick = { TODO })
-            InvestmentOptionCard(title = "Mutual Funds", desc = "Diversified portfolio", onClick = { TODO })*/
+            InvestmentOptionCard(title = "Bonds", desc = "Safe, fixed returns", onClick = { /* TODO */ })
+            InvestmentOptionCard(title = "Stocks", desc = "High growth potential", onClick = { /* TODO */ })
+            InvestmentOptionCard(title = "Mutual Funds", desc = "Diversified portfolio", onClick = { /* TODO */ })
         }
     }
 }
 
-/*
+
 @Composable
 fun InvestmentOptionCard(title: String, desc: String, onClick: () -> Unit) {
     Surface(
@@ -69,7 +69,6 @@ fun InvestmentOptionCard(title: String, desc: String, onClick: () -> Unit) {
         shadowElevation = 4.dp,
         color = MaterialTheme.colorScheme.surfaceVariant,
         modifier = Modifier
-            .weight(1f)
             .height(90.dp)
             .clickable { onClick() }
     ) {
@@ -82,4 +81,3 @@ fun InvestmentOptionCard(title: String, desc: String, onClick: () -> Unit) {
         }
     }
 }
-*/

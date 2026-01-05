@@ -49,17 +49,8 @@ class NFCViewModel @Inject constructor(
             userId = userId,
             cardNumber = "1234 5678 9012 3456",
             cardHolderName = "Test User",
-            expiryMonth = 12,
-            expiryYear = 2034,
-            cvv = "123",
-            issuerBank = "Demo Bank",
-            cardType = "VISA",
-            cardColor = "#1E3A8A",
-            limit = 50000.0,
-            balanceUsed = 0.0,
-            isDefault = true,
-            isActive = true,
-            createdAt = System.currentTimeMillis()
+            expiryDate = "12/34",
+            cvv = "123"
         )
         viewModelScope.launch {
             creditCardDao.insertCard(dummyCard)

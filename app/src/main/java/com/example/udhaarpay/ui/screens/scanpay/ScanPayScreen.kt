@@ -18,6 +18,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.ui.text.font.FontWeight
 import coil.compose.rememberAsyncImagePainter
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatReader
@@ -30,6 +35,7 @@ import java.io.InputStream
 fun ScanPayScreen() {
     var scannedResult by remember { mutableStateOf<String?>(null) }
     var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
+    var searchQuery by remember { mutableStateOf("") }
     val context = LocalContext.current
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         galleryImageUri = uri
@@ -42,6 +48,10 @@ fun ScanPayScreen() {
             }
         }
     }
+    // Mock contacts for search
+    val contacts = listOf("Amit Sharma", "Priya Singh", "Rahul Verma", "Sneha Patel", "Rohit Kumar")
+    val filteredContacts = contacts.filter { it.contains(searchQuery, ignoreCase = true) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -50,7 +60,38 @@ fun ScanPayScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text("Scan & Pay", fontSize = 22.sp, color = Color(0xFF2563EB))
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            label = { Text("Search contacts to pay") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        if (searchQuery.isNotBlank()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E7EF))
+            ) {
+                Column(Modifier.padding(8.dp)) {
+                    filteredContacts.forEach { contact ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable { /* TODO: Pay to contact */ }
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(Icons.Default.AccountCircle, contentDescription = null, tint = Color(0xFF2563EB))
+                            Spacer(Modifier.width(10.dp))
+                            Text(contact, fontSize = 16.sp, color = Color(0xFF1E293B))
+                        }
+                    }
+                }
+            }
+        }
+        Spacer(Modifier.height(12.dp))
         Button(onClick = { /* TODO: Integrate camera QR scan */ }, modifier = Modifier.fillMaxWidth()) {
             Text("Scan QR Code")
         }
@@ -59,11 +100,24 @@ fun ScanPayScreen() {
             Text("Add from Gallery")
         }
         Spacer(Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .size(200.dp)
+                .background(Color(0xFF2563EB), shape = MaterialTheme.shapes.medium)
+                .clickable { /* TODO: Open scanner */ },
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(Icons.Default.QrCodeScanner, contentDescription = "Scanner", tint = Color.White, modifier = Modifier.size(80.dp))
+            if (scannedResult != null) {
+                Text("Scanned!", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+        }
         if (galleryImageUri != null) {
+            Spacer(Modifier.height(12.dp))
             Image(
                 painter = rememberAsyncImagePainter(galleryImageUri),
                 contentDescription = "QR from Gallery",
-                modifier = Modifier.size(180.dp)
+                modifier = Modifier.size(120.dp)
             )
         }
         if (scannedResult != null) {
