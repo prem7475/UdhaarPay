@@ -1,8 +1,3 @@
-@Dao
-interface CreditCardDao {
+// This file is deprecated and intentionally left blank. Use the main source folder version only.
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertCard(creditCard: CreditCard): Long
-
-    @Query("SELECT * FROM credit_cards WHERE userId = :userId")
-// ...existing code...
 
