@@ -23,6 +23,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UdhaarPay"
         tools:targetApi="31">
+        android:enableOnBackInvokedCallback="true"
 
         <activity
             android:name=".MainActivity"
