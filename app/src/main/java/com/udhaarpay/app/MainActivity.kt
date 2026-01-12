@@ -51,6 +51,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import com.udhaarpay.app.ui.screens.investments.InvestmentsNavHost
+import com.udhaarpay.app.ui.screens.expenses.ExpenseScreen
+import com.udhaarpay.app.ui.screens.tickets.TicketScreen
 import com.udhaarpay.app.ui.screens.creditcards.CreditCardScreen
 import com.udhaarpay.app.ui.screens.bankaccounts.BankAccountScreen
 import com.udhaarpay.app.ui.screens.insurance.InsuranceScreen
@@ -164,6 +166,8 @@ fun MainAppContent() {
                             "Bank Accounts" to "bank_accounts",
                             "Insurance" to "insurance",
                             "Debt" to "debt",
+                            "Expenses" to "expenses",
+                            "Tickets" to "tickets",
                             "Profile" to "profile",
                             "Wallets" to "wallet_management",
                             "Reminders" to "reminders",
@@ -285,6 +289,8 @@ fun MainAppContent() {
                         composable("bank_accounts") { BankAccountScreen() }
                         composable("insurance") { InsuranceScreen() }
                         composable("debt") { DebtScreen() }
+                        composable("expenses") { ExpenseScreen() }
+                        composable("tickets") { TicketScreen() }
                         composable("profile") { ProfileScreen() }
                         composable("wallet_management") { WalletManagementScreen() }
                         composable("reminders") { RemindersScreen() }
@@ -380,6 +386,20 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
             "View and edit your profile",
             Icons.Default.Person,
             Color(0xFF7C3AED)
+        ),
+        PaymentOption(
+            "expenses",
+            "Expenses",
+            "Track your expenses",
+            Icons.Default.Settings,
+            Color(0xFFFB7185)
+        ),
+        PaymentOption(
+            "tickets",
+            "Tickets",
+            "View your tickets",
+            Icons.Default.Info,
+            Color(0xFF38BDF8)
         ),
         PaymentOption(
             "wallet_management",
@@ -498,6 +518,8 @@ fun UdhaarPayDashboard(modifier: Modifier = Modifier, onNavigate: (String) -> Un
                                         "bank_accounts" -> onNavigate("bank_accounts")
                                         "insurance" -> onNavigate("insurance")
                                         "debt" -> onNavigate("debt")
+                                        "expenses" -> onNavigate("expenses")
+                                        "tickets" -> onNavigate("tickets")
                                         "profile" -> onNavigate("profile")
                                         "wallet_management" -> onNavigate("wallet_management")
                                         "transactions" -> onNavigate("transactions")

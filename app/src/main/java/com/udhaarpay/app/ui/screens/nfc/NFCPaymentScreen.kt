@@ -1,300 +1,187 @@
 package com.udhaarpay.app.ui.screens.nfc
 
-import android.nfc.NfcAdapter
-import android.widget.Toast
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-// import androidx.compose.material.icons.filled.Contactless // Not available in this Compose version
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.udhaarpay.app.data.local.entities.CreditCard
-import com.udhaarpay.app.ui.viewmodel.NFCViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.udhaarpay.app.R
+import com.udhaarpay.app.data.local.entities.CreditCard
+import com.udhaarpay.app.ui.viewmodel.NFCPaymentViewModel
+import com.udhaarpay.app.ui.viewmodel.NFCTransaction
+import kotlinx.coroutines.delay
+
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NFCPaymentScreen(
-    onBack: () -> Unit,
-    viewModel: NFCViewModel = hiltViewModel()
+    onBack: () -> Unit = {},
+    nfcViewModel: NFCPaymentViewModel = hiltViewModel()
 ) {
-    val cards by viewModel.cards.collectAsState()
-    val selectedCard by viewModel.selectedCard.collectAsState()
+    val cards by nfcViewModel.creditCards.collectAsState()
+    val selectedCard by nfcViewModel.selectedCard.collectAsState()
+    val paymentAmount by nfcViewModel.paymentAmount.collectAsState()
+    val isCardExpanded by nfcViewModel.isCardExpanded.collectAsState()
+    val nfcStatus by nfcViewModel.nfcStatus.collectAsState()
+    val lastTransaction by nfcViewModel.lastTransaction.collectAsState()
+    var showReward by remember { mutableStateOf(false) }
 
-    // UI State for animations
-    var isExpanded by remember { mutableStateOf(false) } // False = Stack, True = Fan Out
-    var isReadyToTap by remember { mutableStateOf(false) } // True when a specific card is selected for payment
-
-    val context = LocalContext.current
-
-    // NFC Check
-    LaunchedEffect(Unit) {
-        val adapter = NfcAdapter.getDefaultAdapter(context)
-        if (adapter == null) {
-            Toast.makeText(context, "NFC is not available on this device", Toast.LENGTH_LONG).show()
-        } else if (!adapter.isEnabled) {
-            Toast.makeText(context, "Please enable NFC in settings", Toast.LENGTH_SHORT).show()
+    LaunchedEffect(nfcStatus) {
+        if (nfcStatus == "Success") {
+            showReward = true
+            delay(1800)
+            showReward = false
         }
     }
 
-    Scaffold(
-        containerColor = Color.Black,
-        topBar = {
-            TopAppBar(
-                title = { Text("NFC Payment", color = Color.White) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-                    }
-                },
-                // Removed colors param for Compose 2023.03.00 compatibility
-            )
-        }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            if (cards.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No cards available", color = Color.Gray)
-                }
-            } else {
-                // Determine which view to show
-                if (isReadyToTap && selectedCard != null) {
-                    ActiveCardView(
-                        card = selectedCard!!,
-                        onCancel = { isReadyToTap = false }
-                    )
-                } else {
-                    CardStackView(
-                        cards = cards,
-                        isExpanded = isExpanded,
-                        onToggleExpand = { isExpanded = !isExpanded },
-                        onSelectCard = { card ->
-                            viewModel.selectCard(card)
-                            isReadyToTap = true
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CardStackView(
-    cards: List<CreditCard>,
-    isExpanded: Boolean,
-    onToggleExpand: () -> Unit,
-    onSelectCard: (CreditCard) -> Unit
-) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .clickable(onClick = { if (!isExpanded) onToggleExpand() }),
-        contentAlignment = Alignment.Center
+            .background(
+                Brush.verticalGradient(
+                    listOf(Color(0xFF0F172A), Color(0xFF1E293B), Color(0xFF6366F1))
+                )
+            )
+            .padding(18.dp)
     ) {
-        cards.forEachIndexed { index, card ->
-            // Animation values
-            val targetOffset = if (isExpanded) {
-                (index - (cards.size - 1) / 2.0f) * 160.0f // Fan out vertically
-            } else {
-                index * 10.0f // Stacked with slight offset
-            }
-
-            val animatedOffset by animateFloatAsState(
-                targetValue = targetOffset,
-                animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                label = "offset"
-            )
-
-            val targetScale = if (isExpanded) 1f else 1f - (cards.size - 1 - index) * 0.05f
-            val animatedScale by animateFloatAsState(targetScale, label = "scale")
-
-            val targetRotation = if (isExpanded) 0f else (index % 2 * 2f - 1f) * 2f // Slight random rotation in stack
-
-            NFCCardItem(
-                card = card,
-                modifier = Modifier
-                    .offset(y = animatedOffset.dp)
-                    .scale(animatedScale)
-                    .graphicsLayer { rotationZ = targetRotation }
-                    .zIndex(index.toFloat()) // Ensure correct drawing order
-                    .clickable {
-                        if (isExpanded) onSelectCard(card) else onToggleExpand()
-                    }
-            )
-        }
-
-        if (!isExpanded) {
-            Text(
-                "Tap stack to view cards",
-                color = Color.Gray,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun ActiveCardView(
-    card: CreditCard,
-    onCancel: () -> Unit
-) {
-    // Pulse Animation for "Ready to Tap"
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val pulseScale by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scale"
-    )
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
-        targetValue = 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "alpha"
-    )
-
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            "Hold near reader to pay",
-            color = Color.White,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Box(contentAlignment = Alignment.Center) {
-            // Ripple Effect
-            Box(
-                modifier = Modifier
-                    .size(300.dp)
-                    .scale(pulseScale)
-                    .alpha(pulseAlpha)
-                    .background(Color(0xFF2563EB), CircleShape) // Primary Blue
-            )
-
-            // The Card
-            NFCCardItem(
-                card = card,
-                modifier = Modifier.scale(1.1f),
-                showDetails = true
-            )
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Icon removed for compatibility
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        TextButton(onClick = onCancel) {
-            Text("Cancel Payment", color = Color.Gray)
-        }
-    }
-}
-
-@Composable
-fun NFCCardItem(
-    card: CreditCard,
-    modifier: Modifier = Modifier,
-    showDetails: Boolean = false
-) {
-    // Card Background Gradient
-    val isRupay = card.cardHolderName.contains("Rupay", ignoreCase = true)
-
-    val gradient = Brush.linearGradient(
-        colors = if (isRupay)
-            listOf(Color(0xFF1E3A8A), Color(0xFF3B82F6)) // Blue for Rupay
-        else
-            listOf(Color(0xFF581C87), Color(0xFFA855F7)) // Purple for others
-    )
-
-    Card(
-        modifier = modifier
-            .width(300.dp)
-            .height(180.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(gradient)
-                .padding(20.dp)
+        Column(
+            Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Bank Name
-                Text(
-                    text = card.cardHolderName,
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Chip Icon
-                Box(
-                    modifier = Modifier
-                        .size(40.dp, 30.dp)
-                        .background(Color(0xFFFFD700), RoundedCornerShape(4.dp))
-                        .alpha(0.8f)
-                )
-
-                // Number and Expiry
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    Text(
-                        text = "•••• •••• •••• ${card.cardNumber.takeLast(4)}",
-                        color = Color.White,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    if (showDetails) {
-                        Text(
-                            text = card.expiryDate,
-                            color = Color.White.copy(alpha = 0.8f),
-                            style = MaterialTheme.typography.bodySmall
-                        )
+            Spacer(Modifier.height(18.dp))
+            Text("NFC Payment", fontWeight = FontWeight.Bold, fontSize = 26.sp, color = Color.White)
+            Spacer(Modifier.height(18.dp))
+            AnimatedVisibility(visible = !isCardExpanded, enter = fadeIn(), exit = fadeOut()) {
+                CardStack(cards, onExpand = { nfcViewModel.expandCardStack() })
+            }
+            AnimatedVisibility(visible = isCardExpanded, enter = fadeIn(), exit = fadeOut()) {
+                CardSelection(cards, selectedCard, onSelect = {
+                    nfcViewModel.selectCard(it)
+                    nfcViewModel.collapseCardStack()
+                })
+            }
+            Spacer(Modifier.height(24.dp))
+            OutlinedTextField(
+                value = paymentAmount,
+                onValueChange = { nfcViewModel.setPaymentAmount(it) },
+                label = { Text("Enter Amount") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(0.7f)
+            )
+            Spacer(Modifier.height(18.dp))
+            Button(
+                onClick = {
+                    if (selectedCard != null && paymentAmount.isNotBlank()) {
+                        nfcViewModel.processNFCPayment(paymentAmount)
                     }
+                },
+                enabled = selectedCard != null && paymentAmount.isNotBlank() && nfcStatus != "Processing",
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.height(54.dp).width(180.dp)
+            ) {
+                if (nfcStatus == "Processing") {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    Spacer(Modifier.width(8.dp))
                 }
+                Text(if (nfcStatus == "Processing") "Paying..." else "Pay via NFC", fontWeight = FontWeight.Bold)
+            }
+            Spacer(Modifier.height(24.dp))
+            AnimatedContent(targetState = nfcStatus, transitionSpec = {
+                fadeIn(animationSpec = tween(400)) with fadeOut(animationSpec = tween(400))
+            }) { status ->
+                if (status == "Success" && lastTransaction != null) {
+                    PaymentSuccessView(lastTransaction!!, showReward)
+                } else if (status != "Ready") {
+                    Text(status, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CardStack(cards: List<CreditCard>, onExpand: () -> Unit) {
+    Box(Modifier.height(180.dp).fillMaxWidth(), contentAlignment = Alignment.Center) {
+        cards.take(3).reversed().forEachIndexed { i, card ->
+            val offset = 16.dp * i
+                val scale = 1f - 0.07f * i
+                CardView(
+                card = card,
+                modifier = Modifier
+                    .offset(y = offset)
+                        .graphicsLayer { this.scaleX = scale; this.scaleY = scale }
+                    .clickable { onExpand() },
+                showDetails = i == 0
+            )
+        }
+    }
+}
+
+@Composable
+fun CardSelection(cards: List<CreditCard>, selected: CreditCard?, onSelect: (CreditCard) -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("Select Card", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            cards.forEach { card ->
+                CardView(
+                    card = card,
+                    modifier = Modifier.clickable { onSelect(card) },
+                        showDetails = selected?.cardId == card.cardId
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardView(card: CreditCard, modifier: Modifier = Modifier, showDetails: Boolean = false) {
+    val cardColors = listOf(Color(0xFF6366F1), Color(0xFF0EA5E9), Color(0xFF22C55E))
+        val color = cardColors[(card.cardId.toInt() - 1) % cardColors.size]
+    Surface(
+        modifier = modifier
+            .size(width = 220.dp, height = 140.dp)
+            .clip(RoundedCornerShape(22.dp)),
+        color = color,
+        shadowElevation = 12.dp
+    ) {
+        Column(Modifier.padding(18.dp)) {
+            Text("RuPay", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Spacer(Modifier.height(8.dp))
+                Text("**** **** **** ${card.cardNumber.takeLast(4)}", color = Color.White, fontSize = 16.sp)
+            Spacer(Modifier.height(8.dp))
+            if (showDetails) {
+                Text("Balance: ₹${card.balance}", color = Color.White, fontWeight = FontWeight.SemiBold)
+                Text("Expiry: ${card.expiry}", color = Color.White, fontSize = 13.sp)
+            }
+        }
+    }
+}
+
+@Composable
+fun PaymentSuccessView(txn: NFCTransaction, showReward: Boolean) {
+    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Payment Successful!", color = Color(0xFF22C55E), fontWeight = FontWeight.Bold, fontSize = 22.sp)
+            Spacer(Modifier.height(8.dp))
+            Text("Paid ₹${txn.amount} to ${txn.merchant}", color = Color.White, fontSize = 16.sp)
+            Spacer(Modifier.height(8.dp))
+            Text("Txn ID: ${txn.id}", color = Color(0xFFCBD5E1), fontSize = 13.sp)
+            AnimatedVisibility(visible = showReward, enter = slideInVertically() + fadeIn(), exit = fadeOut()) {
+                Text("🎁 Reward Unlocked!", color = Color(0xFFF59E0B), fontWeight = FontWeight.Bold, fontSize = 20.sp)
             }
         }
     }

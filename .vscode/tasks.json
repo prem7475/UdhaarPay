@@ -20,6 +20,26 @@
 				"$javac"
 			],
 			"group": "build"
+		},
+		{
+			"label": "Build Android app after DI fix",
+			"type": "shell",
+			"command": "./gradlew assembleDebug"
+		},
+		{
+			"label": "Build Android app after DI fix",
+			"type": "shell",
+			"command": "./gradlew clean assembleDebug"
+		},
+		{
+			"label": "Build Android app after DI fix",
+			"type": "shell",
+			"command": "./gradlew assembleDebug"
+		},
+		{
+			"label": "Build Android app after DI fix",
+			"type": "shell",
+			"command": "./gradlew assembleDebug"
 		}
 	]
 }

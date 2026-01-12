@@ -14,15 +14,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val mockDebts = listOf(
-    Debt("Personal Loan", "Active", "₹50,000", "2027-05-01"),
-    Debt("Credit Card Dues", "Overdue", "₹12,000", "2025-01-15")
-)
-data class Debt(val type: String, val status: String, val amount: String, val dueDate: String)
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.udhaarpay.app.ui.viewmodel.DebtViewModel
 
 @Composable
-fun DebtScreen() {
+fun DebtScreen(viewModel: DebtViewModel = hiltViewModel()) {
     var showPay by remember { mutableStateOf(false) }
+    val debts by viewModel.debts.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +35,7 @@ fun DebtScreen() {
             modifier = Modifier.padding(bottom = 10.dp)
         )
         LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            items(mockDebts) { debt ->
+            items(debts) { debt ->
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -68,8 +66,8 @@ fun DebtScreen() {
                             )
                         }
                         Spacer(Modifier.height(6.dp))
-                        Text("Amount: ${debt.amount}", fontWeight = FontWeight.Medium, fontSize = 15.sp, color = Color(0xFF22C55E))
-                        Text("Due: ${debt.dueDate}", fontSize = 13.sp, color = Color(0xFFCBD5E1))
+                        Text("Amount: ₹${debt.amount}", fontWeight = FontWeight.Medium, fontSize = 15.sp, color = Color(0xFF22C55E))
+                        Text("Date: ${java.text.SimpleDateFormat("dd MMM yyyy").format(java.util.Date(debt.date))}", fontSize = 13.sp, color = Color(0xFFCBD5E1))
                         Spacer(Modifier.height(10.dp))
                         Button(
                             onClick = { showPay = true },

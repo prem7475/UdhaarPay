@@ -32,28 +32,31 @@ class NFCViewModel @Inject constructor(
         val testUserId = "user_001" // Temporary ID for testing
 
         viewModelScope.launch {
-            creditCardDao.getUserCards(testUserId).collect { cardList ->
+            creditCardDao.getAll().collect { cardList ->
                 _cards.value = cardList
 
                 // If list is empty, let's create a dummy card so you can see the UI
                 if (cardList.isEmpty()) {
-                    createDummyCard(testUserId)
+                    createDummyCard()
                 }
             }
         }
     }
 
-    private fun createDummyCard(userId: String) {
+    private fun createDummyCard() {
         val dummyCard = CreditCard(
-            id = 0,
-            userId = userId,
-            cardNumber = "1234 5678 9012 3456",
-            cardHolderName = "Test User",
-            expiryDate = "12/34",
-            cvv = "123"
+            cardId = 0L,
+            cardNumber = "1234",
+            cardType = "RuPay",
+            issuer = "Test Bank",
+            balance = 10000.0,
+            limit = 20000.0,
+            expiry = "12/34",
+            status = "Active",
+            upiLinked = true
         )
         viewModelScope.launch {
-            creditCardDao.insertCard(dummyCard)
+            creditCardDao.insert(dummyCard)
         }
     }
 

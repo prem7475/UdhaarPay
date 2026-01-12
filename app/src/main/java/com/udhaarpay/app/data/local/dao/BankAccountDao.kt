@@ -11,27 +11,21 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface BankAccountDao {
-    @Query("SELECT * FROM bank_accounts WHERE userId = :userId")
-    fun getAccountsForUser(userId: String): Flow<List<BankAccount>>
-
-    @Query("SELECT * FROM bank_accounts")
-    fun getAllBankAccounts(): Flow<List<BankAccount>>
-
-    @Query("SELECT * FROM bank_accounts WHERE id = :accountId")
-    fun getAccountById(accountId: Long): BankAccount?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAccount(account: BankAccount): Long
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBankAccount(account: BankAccount): Long
+    suspend fun insert(account: BankAccount): Long
 
     @Update
-    fun updateAccount(account: BankAccount)
+    suspend fun update(account: BankAccount): Int
 
     @Delete
-    fun deleteAccount(account: BankAccount)
+    suspend fun delete(account: BankAccount): Int
 
-    @Delete
-    fun deleteBankAccount(account: BankAccount)
+    @Query("SELECT * FROM bank_accounts")
+    fun getAll(): Flow<List<BankAccount>>
+
+    @Query("SELECT * FROM bank_accounts WHERE accountId = :accountId LIMIT 1")
+    fun getById(accountId: Long): Flow<BankAccount?>
+
+    @Query("SELECT * FROM bank_accounts WHERE bankName = :bankName")
+    fun getByBankName(bankName: String): Flow<List<BankAccount>>
 }

@@ -20,16 +20,73 @@ import androidx.compose.material.icons.filled.Delete
 
 
 import androidx.hilt.navigation.compose.hiltViewModel
-// All usages of BankAccount are commented out for compatibility
-import java.util.UUID
+import com.udhaarpay.app.ui.viewmodel.BankAccountViewModel
 
 @Composable
-fun BankAccountScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text("Bank account feature temporarily unavailable", color = Color.White)
+fun BankAccountScreen(viewModel: BankAccountViewModel = androidx.hilt.navigation.compose.hiltViewModel()) {
+    val accounts by viewModel.accounts.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+            Text("Bank Accounts", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = { showAddDialog = true }, shape = RoundedCornerShape(12.dp)) {
+                Text("Add Bank Account")
+            }
+            Spacer(Modifier.height(12.dp))
+            if (accounts.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No bank accounts found", color = Color.Gray)
+                }
+            } else {
+                LazyColumn(modifier = Modifier.weight(1f)) {
+                    items(accounts) { account ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(Color(0xFF232946))
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(account.bankName, color = Color.White, fontWeight = FontWeight.Bold)
+                                    Text(account.accountNumber, color = Color.LightGray, fontSize = 13.sp)
+                                    Text(account.ifscCode, color = Color.LightGray, fontSize = 13.sp)
+                                }
+                                IconButton(onClick = { viewModel.deleteBankAccount(account) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (showAddDialog) {
+            AddBankAccountDialog(
+                onAdd = { bankName, accountNumber, ifsc, holderName ->
+                    val newAccount = com.udhaarpay.app.data.local.entities.BankAccount(
+                        bankName = bankName,
+                        accountNumber = accountNumber,
+                        ifscCode = ifsc,
+                        accountType = "Savings",
+                        balance = 0.0,
+                        nickname = null,
+                        addedDate = System.currentTimeMillis()
+                    )
+                    viewModel.addBankAccount(newAccount)
+                    showAddDialog = false
+                },
+                onDismiss = { showAddDialog = false }
+            )
+        }
     }
 }
 

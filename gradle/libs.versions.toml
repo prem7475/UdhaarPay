@@ -12,7 +12,7 @@ androidxCore = "1.10.1"
 androidxLifecycle = "2.6.2"
 androidxActivity = "1.7.2"
 androidxFragment = "1.6.2"
-androidxRoom = "2.5.2"
+androidxRoom = "2.6.1"
 androidxHilt = "1.0.0"
 retrofit = "2.9.0"
 okhttp = "4.10.0"
@@ -79,7 +79,7 @@ androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidxRoom" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
-androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "androidxRoomTesting" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "androidxRoom" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "androidxHilt" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxHilt" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHilt" }

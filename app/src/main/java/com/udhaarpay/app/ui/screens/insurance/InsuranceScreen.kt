@@ -14,15 +14,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-val insuranceTypes = listOf("Health Insurance", "Life Insurance", "Car Insurance", "Travel Insurance", "Home Insurance")
-val mockPolicies = listOf(
-    Policy("Health Insurance", "Active", "₹5,00,000", "2026-01-01"),
-    Policy("Car Insurance", "Expired", "₹2,00,000", "2024-12-31")
-)
-data class Policy(val type: String, val status: String, val coverage: String, val expiry: String)
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.udhaarpay.app.ui.viewmodel.InsuranceViewModel
 
 @Composable
-fun InsuranceScreen() {
+fun InsuranceScreen(viewModel: InsuranceViewModel = hiltViewModel()) {
+    val policies by viewModel.insurances.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -32,7 +29,7 @@ fun InsuranceScreen() {
         Text("Your Policies", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color.White)
         Spacer(Modifier.height(10.dp))
         LazyColumn(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            items(mockPolicies) { policy ->
+            items(policies) { policy ->
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
@@ -43,9 +40,9 @@ fun InsuranceScreen() {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text(policy.type, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
+                            Text(policy.policyType, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
                             Text("Coverage: ${policy.coverage}", fontSize = 14.sp, color = Color(0xFF22C55E))
-                            Text("Expiry: ${policy.expiry}", fontSize = 13.sp, color = Color(0xFFCBD5E1))
+                            Text("Expiry: ${policy.expiryDate}", fontSize = 13.sp, color = Color(0xFFCBD5E1))
                         }
                         Text(policy.status, fontWeight = FontWeight.Bold, fontSize = 14.sp, color = if (policy.status == "Active") Color(0xFF22C55E) else Color(0xFFDC2626))
                     }

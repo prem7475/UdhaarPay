@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.udhaarpay.app.ui.viewmodel.NFCViewModel
+import com.udhaarpay.app.ui.viewmodel.NFCPaymentViewModel
 
 import coil.compose.rememberAsyncImagePainter
 import com.google.zxing.BarcodeFormat
@@ -82,7 +82,7 @@ fun ScanPayScreen() {
     }
 
     if (showNfcDialog) {
-        val nfcViewModel: NFCViewModel = hiltViewModel()
+        val nfcViewModel: NFCPaymentViewModel = hiltViewModel()
         Dialog(onDismissRequest = { showNfcDialog = false }) {
             Surface(
                 shape = RoundedCornerShape(24.dp),
@@ -90,7 +90,7 @@ fun ScanPayScreen() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 Box(Modifier.sizeIn(minWidth = 340.dp, minHeight = 480.dp)) {
-                    NFCPaymentScreen(onBack = { showNfcDialog = false }, viewModel = nfcViewModel)
+                    NFCPaymentScreen(onBack = { showNfcDialog = false }, nfcViewModel = nfcViewModel)
                 }
             }
         }
