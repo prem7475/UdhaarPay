@@ -12,5 +12,6 @@ class UPIPaymentRepository @Inject constructor(
 ) {
     fun getAll(): Flow<List<UPIPayment>> = upiPaymentDao.getAll()
     suspend fun insert(payment: UPIPayment): Long = upiPaymentDao.insert(payment)
+    suspend fun update(payment: UPIPayment): Int = upiPaymentDao.update(payment)
     suspend fun delete(payment: UPIPayment): Int = upiPaymentDao.delete(payment)
 }

@@ -11,6 +11,7 @@ data class BankAccount(
     val ifscCode: String,
     val accountType: String, // Savings/Current/Salary
     val balance: Double,
+    val upiPin: String? = null,
     val nickname: String?,
     val addedDate: Long
 )

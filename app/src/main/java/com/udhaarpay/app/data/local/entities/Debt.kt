@@ -9,6 +9,9 @@ data class Debt(
     val personName: String,
     val amount: Double,
     val type: String, // given/taken
+    val category: String = "Other",
+    val paymentSource: String = "Wallet", // Bank/Card/Wallet
+    val accountId: Long? = null,
     val date: Long,
     val reason: String?,
     val status: String, // pending/settled

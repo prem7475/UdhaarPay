@@ -14,5 +14,6 @@ data class Expense(
     val description: String?,
     val date: Long,
     val month: String,
-    val receiptUrl: String?
+    val receiptUrl: String?,
+    val accountId: Long? = null
 )

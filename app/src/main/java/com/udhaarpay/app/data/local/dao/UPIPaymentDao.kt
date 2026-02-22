@@ -23,5 +23,7 @@ interface UPIPaymentDao {
 
     @Query("SELECT * FROM upi_payments WHERE status = :status")
     fun getByStatus(status: String): Flow<List<UPIPayment>>
-    fun update(payment: UPIPayment)
+
+    @Update
+    suspend fun update(payment: UPIPayment): Int
 }

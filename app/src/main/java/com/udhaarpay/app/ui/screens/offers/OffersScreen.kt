@@ -1,50 +1,104 @@
 package com.udhaarpay.app.ui.screens.offers
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
-val mockOffers = listOf(
-    Offer("10% Cashback on UPI", "Get 10% cashback on your next UPI payment above ₹500.", "Valid till 10 Jan 2026"),
-    Offer("Movie Ticket Discount", "Flat ₹100 off on PVR bookings via UdhaarPay.", "Valid till 15 Jan 2026"),
-    Offer("Bill Payment Reward", "Pay any utility bill and get ₹50 wallet credit.", "Valid till 20 Jan 2026"),
-    Offer("Refer & Earn", "Refer a friend and earn ₹200 for each successful signup.", "No expiry")
+private data class Offer(
+    val title: String,
+    val description: String,
+    val category: String,
+    val validity: String
 )
-data class Offer(val title: String, val description: String, val validity: String)
 
 @Composable
 fun OffersScreen() {
+    val offers = listOf(
+        Offer("10% Cashback on UPI", "Get 10% cashback on UPI above INR 500", "Shopping", "Valid till 28 Feb 2026"),
+        Offer("Dining Gold Offer", "Flat INR 200 off at premium restaurants", "Dining", "Valid till 10 Mar 2026"),
+        Offer("Travel Bonus Miles", "Earn 5x points on flights and hotels", "Travel", "Valid till 30 Mar 2026"),
+        Offer("Movie Ticket Deal", "Flat INR 100 off on movie bookings", "Entertainment", "Valid till 12 Mar 2026"),
+        Offer("Luxury Retail Coupon", "15% off at partner luxury stores", "Shopping", "Valid till 31 Mar 2026")
+    )
+    val categories = listOf("All", "Travel", "Dining", "Shopping", "Entertainment")
+
+    var search by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
+    var cashbackEarned by remember { mutableStateOf(2450.0) }
+
+    val filtered = offers.filter {
+        val matchSearch = it.title.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
+        val matchCategory = selectedCategory == "All" || it.category.equals(selectedCategory, ignoreCase = true)
+        matchSearch && matchCategory
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F172A))
-            .padding(20.dp)
+            .padding(16.dp)
     ) {
-        Text("Offers & Rewards", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFFF59E0B))
-        Spacer(Modifier.height(12.dp))
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            items(mockOffers) { offer ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B)),
-                    elevation = CardDefaults.cardElevation(6.dp)
+        Text("Cashback & Offers", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(10.dp))
+        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+            Column(modifier = Modifier.fillMaxWidth().padding(14.dp)) {
+                Text("Cashback Earned", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("INR ${"%.2f".format(cashbackEarned)}", style = MaterialTheme.typography.headlineSmall)
+                Text("Reward points and coupons are mock values stored locally.")
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+
+        OutlinedTextField(
+            value = search,
+            onValueChange = { search = it },
+            label = { Text("Search coupons") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            categories.forEach { category ->
+                TextButton(
+                    onClick = { selectedCategory = category }
                 ) {
-                    Column(Modifier.padding(18.dp)) {
-                        Text(offer.title, fontWeight = FontWeight.Bold, fontSize = 17.sp, color = Color.White)
-                        Text(offer.description, fontSize = 14.sp, color = Color(0xFFCBD5E1))
-                        Text(offer.validity, fontSize = 13.sp, color = Color(0xFFF59E0B), modifier = Modifier.padding(top = 4.dp))
+                    Text(
+                        category,
+                        color = if (selectedCategory == category) MaterialTheme.colorScheme.secondary
+                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(filtered) { offer ->
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                    Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                        Text(offer.title, fontWeight = FontWeight.SemiBold)
+                        Text(offer.description, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Category: ${offer.category}")
+                        Text(offer.validity, color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }

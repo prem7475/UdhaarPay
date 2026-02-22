@@ -15,6 +15,8 @@ import com.udhaarpay.app.data.local.dao.InvestmentDao
 import com.udhaarpay.app.data.local.dao.InsuranceDao
 import com.udhaarpay.app.data.local.dao.CreditCardDao
 import com.udhaarpay.app.data.local.dao.BankAccountDao
+import com.udhaarpay.app.data.local.dao.NFCTransactionDao
+import com.udhaarpay.app.data.local.dao.PaperTradingDao
 
 @Database(
 	entities = [
@@ -26,9 +28,12 @@ import com.udhaarpay.app.data.local.dao.BankAccountDao
 		Investment::class,
 		Insurance::class,
 		CreditCard::class,
-		BankAccount::class
+		BankAccount::class,
+		NFCTransactionEntity::class,
+		PaperTradingAccount::class,
+		Trade::class
 	],
-	version = 1,
+	version = 7,
 	exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -41,5 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
 	abstract fun insuranceDao(): InsuranceDao
 	abstract fun creditCardDao(): CreditCardDao
 	abstract fun bankAccountDao(): BankAccountDao
+	abstract fun nfcTransactionDao(): NFCTransactionDao
+	abstract fun paperTradingDao(): PaperTradingDao
 }
 

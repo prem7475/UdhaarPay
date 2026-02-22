@@ -16,6 +16,8 @@ data class UserProfile(
     val city: String,
     val state: String,
     val pincode: String,
+    val upiId: String? = null,
+    val walletPinFreeLimit: Double = 200.0,
     val profilePhotoUrl: String?,
     val panNumber: String?,
     val aadhaarNumber: String?,
