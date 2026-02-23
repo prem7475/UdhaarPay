@@ -78,7 +78,7 @@ fun WalletManagementScreen(viewModel: WalletViewModel = hiltViewModel()) {
         Text("Wallet Transactions", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(6.dp))
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(transactions) { expense ->
+            items(items = transactions, key = { it.expenseId }) { expense ->
                 WalletTxnRow(expense = expense)
             }
         }

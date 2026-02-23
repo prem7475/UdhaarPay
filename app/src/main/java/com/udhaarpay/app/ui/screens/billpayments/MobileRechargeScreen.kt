@@ -103,7 +103,10 @@ fun MobileRechargeScreen(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(plans) { plan ->
+            items(
+                items = plans,
+                key = { "${it.provider}-${it.price}-${it.benefits}" }
+            ) { plan ->
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = if (selectedPlan == plan) {

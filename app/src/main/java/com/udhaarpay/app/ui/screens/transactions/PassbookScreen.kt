@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -140,7 +140,14 @@ fun PassbookScreen(
         )
         Spacer(Modifier.padding(6.dp))
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(rowsWithRunning) { (row, balanceAfter) ->
+            itemsIndexed(
+                items = rowsWithRunning,
+                key = { index, pair ->
+                    val (row, _) = pair
+                    "${row.date}-${row.title}-${row.subtitle}-${index}"
+                }
+            ) { _, pair ->
+                val (row, balanceAfter) = pair
                 Card(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {

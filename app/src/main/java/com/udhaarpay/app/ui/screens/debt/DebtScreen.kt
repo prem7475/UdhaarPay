@@ -1,6 +1,5 @@
 package com.udhaarpay.app.ui.screens.debt
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,18 +61,21 @@ fun DebtScreen(
     val status by viewModel.statusMessage.collectAsState()
     val cards by creditCardViewModel.creditCards.collectAsState()
 
-    val animatedGiven by animateFloatAsState(targetValue = totalGiven.toFloat(), label = "given")
-    val animatedTaken by animateFloatAsState(targetValue = totalTaken.toFloat(), label = "taken")
-    val animatedNet by animateFloatAsState(targetValue = netPosition.toFloat(), label = "net")
-    val animatedExpense by animateFloatAsState(targetValue = totalExpense.toFloat(), label = "expense")
-    val animatedIncome by animateFloatAsState(targetValue = totalIncome.toFloat(), label = "income")
-
     var showAddDialog by remember { mutableStateOf(false) }
     var showRecordDialog by remember { mutableStateOf(false) }
-    var settleDialogDebt by remember { mutableStateOf<Debt?>(null) }
-    var editAmountAccount by remember { mutableStateOf<BankAccount?>(null) }
+    var settleDialogDebtId by remember { mutableStateOf<Long?>(null) }
+    var editAmountAccountId by remember { mutableStateOf<Long?>(null) }
 
-    val orderedDebts = debts.sortedByDescending { it.date }
+    val orderedDebts = remember(debts) { debts.sortedByDescending { it.date } }
+    val orderedAccounts = remember(accounts) { accounts.sortedBy { it.accountId } }
+    val recentExpenses = remember(expenses) { expenses.sortedByDescending { it.date }.take(12) }
+    val settleDialogDebt = remember(settleDialogDebtId, orderedDebts) {
+        settleDialogDebtId?.let { id -> orderedDebts.firstOrNull { it.debtId == id } }
+    }
+    val editAmountAccount = remember(editAmountAccountId, orderedAccounts) {
+        editAmountAccountId?.let { id -> orderedAccounts.firstOrNull { it.accountId == id } }
+    }
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -85,23 +88,23 @@ fun DebtScreen(
         Text("Debt & Spend Manager", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
 
         SummaryCard(
-            totalGiven = animatedGiven.toDouble(),
-            totalTaken = animatedTaken.toDouble(),
-            net = animatedNet.toDouble(),
-            expense = animatedExpense.toDouble(),
-            income = animatedIncome.toDouble()
+            totalGiven = totalGiven,
+            totalTaken = totalTaken,
+            net = netPosition,
+            expense = totalExpense,
+            income = totalIncome
         )
 
         Text("Accounts / Wallet / Cash", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         AccountBalancesSection(
-            accounts = accounts,
-            onEditAmount = { editAmountAccount = it }
+            accounts = orderedAccounts,
+            onEditAmount = { editAmountAccountId = it.accountId }
         )
 
         SpendingAnalysisSection(spendingByCategory = spendingByCategory)
 
         Text("Recent Spend Records", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        RecentExpensesSection(expenses = expenses)
+        RecentExpensesSection(expenses = recentExpenses)
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
             UdhaarPayButton(text = "Add Debt Entry", onClick = { showAddDialog = true }, modifier = Modifier.weight(1f))
@@ -109,7 +112,7 @@ fun DebtScreen(
         }
         UdhaarPayButton(
             text = "Track Settlements",
-            onClick = { settleDialogDebt = orderedDebts.firstOrNull() },
+            onClick = { settleDialogDebtId = orderedDebts.firstOrNull()?.debtId },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -125,7 +128,7 @@ fun DebtScreen(
             orderedDebts.forEach { debt ->
                 DebtEntryCard(
                     debt = debt,
-                    onSettle = { settleDialogDebt = debt },
+                    onSettle = { settleDialogDebtId = debt.debtId },
                     onDelete = { viewModel.delete(debt) }
                 )
             }
@@ -135,7 +138,7 @@ fun DebtScreen(
 
     if (showAddDialog) {
         AddDebtDialog(
-            bankAccounts = accounts.map { it.accountId to "${it.bankName} ${it.accountNumber}" },
+            bankAccounts = orderedAccounts.map { it.accountId to "${it.bankName} ${it.accountNumber}" },
             cards = cards.map { it.cardId to "${it.issuer} ${it.cardNumber}" },
             onDismiss = { showAddDialog = false },
             onSave = { person, amount, type, category, source, accountId, reason ->
@@ -155,7 +158,7 @@ fun DebtScreen(
 
     if (showRecordDialog) {
         AddSpendIncomeDialog(
-            bankAccounts = accounts.map { it.accountId to "${it.bankName} ${it.accountNumber}" },
+            bankAccounts = orderedAccounts.map { it.accountId to "${it.bankName} ${it.accountNumber}" },
             cards = cards.map { it.cardId to "${it.issuer} ${it.cardNumber}" },
             onDismiss = { showRecordDialog = false },
             onSave = { amount, isIncome, category, source, accountId, description ->
@@ -175,9 +178,9 @@ fun DebtScreen(
     settleDialogDebt?.let { debt ->
         SettleDebtDialog(
             debt = debt,
-            bankAccounts = accounts.map { it.accountId to "${it.bankName} ${it.accountNumber}" },
+            bankAccounts = orderedAccounts.map { it.accountId to "${it.bankName} ${it.accountNumber}" },
             cards = cards.map { it.cardId to "${it.issuer} ${it.cardNumber}" },
-            onDismiss = { settleDialogDebt = null },
+            onDismiss = { settleDialogDebtId = null },
             onSettle = { amount, source, accountId ->
                 viewModel.settleDebtPartial(
                     debt = debt,
@@ -185,7 +188,7 @@ fun DebtScreen(
                     settlementSource = source,
                     settlementAccountId = accountId
                 )
-                settleDialogDebt = null
+                settleDialogDebtId = null
             }
         )
     }
@@ -193,10 +196,10 @@ fun DebtScreen(
     editAmountAccount?.let { account ->
         EditAccountAmountDialog(
             account = account,
-            onDismiss = { editAmountAccount = null },
+            onDismiss = { editAmountAccountId = null },
             onSave = { amount ->
                 viewModel.updateAccountAmount(account.accountId, amount)
-                editAmountAccount = null
+                editAmountAccountId = null
             }
         )
     }
@@ -296,17 +299,20 @@ private fun AccountBalancesSection(
 
 @Composable
 private fun SpendingAnalysisSection(spendingByCategory: Map<String, Double>) {
+    val categoryRows = remember(spendingByCategory) {
+        spendingByCategory.entries.sortedByDescending { it.value }.take(8)
+    }
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
             Text("Spending Analysis", fontWeight = FontWeight.SemiBold)
-            if (spendingByCategory.isEmpty()) {
+            if (categoryRows.isEmpty()) {
                 Spacer(Modifier.height(6.dp))
                 Text("No spending records yet.")
                 return@Column
             }
 
-            val max = spendingByCategory.values.maxOrNull()?.coerceAtLeast(1.0) ?: 1.0
-            spendingByCategory.entries.take(8).forEach { (category, amount) ->
+            val max = categoryRows.maxOfOrNull { it.value }?.coerceAtLeast(1.0) ?: 1.0
+            categoryRows.forEach { (category, amount) ->
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(category, modifier = Modifier.width(92.dp), fontSize = 12.sp)
@@ -333,7 +339,7 @@ private fun RecentExpensesSection(expenses: List<Expense>) {
     }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        expenses.sortedByDescending { it.date }.take(12).forEach { expense ->
+        expenses.forEach { expense ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Row(
                     modifier = Modifier
@@ -367,8 +373,8 @@ private fun EditAccountAmountDialog(
     onDismiss: () -> Unit,
     onSave: (Double) -> Unit
 ) {
-    var amountText by remember { mutableStateOf(account.balance.toString()) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var amountText by remember(account.accountId, account.balance) { mutableStateOf(account.balance.toString()) }
+    var error by remember(account.accountId) { mutableStateOf<String?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -419,6 +425,10 @@ private fun AddSpendIncomeDialog(
     var error by remember { mutableStateOf<String?>(null) }
 
     val sourceAccounts = if (source.equals("Card", true)) cards else bankAccounts
+    LaunchedEffect(source, bankAccounts, cards) {
+        val available = if (source.equals("Card", true)) cards else bankAccounts
+        accountId = available.firstOrNull { it.first == accountId }?.first ?: available.firstOrNull()?.first
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -506,6 +516,10 @@ private fun AddDebtDialog(
     var accountId by remember { mutableStateOf<Long?>(bankAccounts.firstOrNull()?.first) }
     var reason by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(source, bankAccounts, cards) {
+        val available = if (source.equals("Card", true)) cards else bankAccounts
+        accountId = available.firstOrNull { it.first == accountId }?.first ?: available.firstOrNull()?.first
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -573,11 +587,15 @@ private fun SettleDebtDialog(
     onDismiss: () -> Unit,
     onSettle: (Double, String, Long?) -> Unit
 ) {
-    var amount by remember { mutableStateOf("") }
-    var source by remember { mutableStateOf("Bank") }
-    var accountId by remember { mutableStateOf<Long?>(bankAccounts.firstOrNull()?.first) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var amount by remember(debt.debtId) { mutableStateOf("") }
+    var source by remember(debt.debtId) { mutableStateOf("Bank") }
+    var accountId by remember(debt.debtId) { mutableStateOf<Long?>(bankAccounts.firstOrNull()?.first) }
+    var error by remember(debt.debtId) { mutableStateOf<String?>(null) }
     val remaining = debt.amount - (debt.amountSettled ?: 0.0)
+    LaunchedEffect(source, bankAccounts, cards, debt.debtId) {
+        val available = if (source.equals("Card", true)) cards else bankAccounts
+        accountId = available.firstOrNull { it.first == accountId }?.first ?: available.firstOrNull()?.first
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,

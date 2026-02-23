@@ -40,6 +40,7 @@ private data class TicketPartner(val title: String, val type: String, val url: S
 @Composable
 fun TicketScreen(viewModel: TicketViewModel = hiltViewModel()) {
     val tickets by viewModel.tickets.collectAsState()
+    val sortedTickets = remember(tickets) { tickets.sortedByDescending { it.date } }
 
     val partners = listOf(
         TicketPartner("Movies", "movie", "https://in.bookmyshow.com/"),
@@ -168,7 +169,7 @@ fun TicketScreen(viewModel: TicketViewModel = hiltViewModel()) {
         Spacer(Modifier.height(6.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(tickets.sortedByDescending { it.date }) { ticket ->
+            items(items = sortedTickets, key = { it.ticketId }) { ticket ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                         Text("${ticket.ticketType.uppercase(Locale.getDefault())} | ${ticket.provider}", fontWeight = FontWeight.SemiBold)

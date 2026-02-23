@@ -162,7 +162,7 @@ fun CreditCardScreen(
                 }
                 Spacer(Modifier.height(10.dp))
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(cards) { card ->
+                    items(items = cards, key = { it.cardId }) { card ->
                         val isRevealed = card.cardId in revealedCardIds
                         Card(
                             shape = RoundedCornerShape(12.dp),
@@ -298,7 +298,10 @@ fun CreditCardScreen(
                 }
                 Spacer(Modifier.height(8.dp))
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(filteredCoupons) { coupon ->
+                    items(
+                        items = filteredCoupons,
+                        key = { "${it.code}-${it.title}" }
+                    ) { coupon ->
                         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                             Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                                 Text(coupon.title, fontWeight = FontWeight.SemiBold)

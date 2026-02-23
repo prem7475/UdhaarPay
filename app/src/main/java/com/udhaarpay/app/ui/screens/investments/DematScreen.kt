@@ -109,7 +109,7 @@ fun DematScreen(viewModel: InvestmentViewModel = hiltViewModel()) {
             Text("Holdings", fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(6.dp))
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(holdings) { holding ->
+                items(items = holdings, key = { it.symbol }) { holding ->
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                         Row(modifier = Modifier.fillMaxWidth().padding(12.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                             Column {

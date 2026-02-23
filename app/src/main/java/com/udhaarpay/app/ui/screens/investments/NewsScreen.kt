@@ -108,7 +108,7 @@ fun NewsScreen(viewModel: MarketNewsViewModel = hiltViewModel()) {
         } else {
             Spacer(Modifier.height(10.dp))
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(news) { article ->
+                items(items = news, key = { "${it.link}-${it.publishedAtMillis}" }) { article ->
                     NewsCard(
                         article = article,
                         onOpen = { selectedArticle = article }
@@ -191,4 +191,3 @@ private fun NewsCard(
         }
     }
 }
-

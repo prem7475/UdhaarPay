@@ -63,7 +63,7 @@ fun BondsScreen(viewModel: InvestmentViewModel = hiltViewModel()) {
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(options) { bond ->
+            items(items = options, key = { it.name }) { bond ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(12.dp),

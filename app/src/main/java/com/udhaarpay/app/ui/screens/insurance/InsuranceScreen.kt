@@ -58,7 +58,7 @@ fun InsuranceScreen(viewModel: InsuranceViewModel = hiltViewModel()) {
             Text("No policies yet.")
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(policies) { policy ->
+                items(items = policies, key = { it.policyId }) { policy ->
                     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(12.dp),

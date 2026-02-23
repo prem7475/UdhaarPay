@@ -91,6 +91,7 @@ fun InvestmentScreen(
     var type by remember { mutableStateOf("SIP") }
     var frequency by remember { mutableStateOf("Monthly") }
     var error by remember { mutableStateOf<String?>(null) }
+    val sortedInvestments = remember(investments) { investments.sortedByDescending { it.date } }
 
     val pnlProgress by animateFloatAsState(
         targetValue = if (totalInvested == 0.0) 0f else (totalCurrent / totalInvested).toFloat().coerceAtLeast(0f),
@@ -172,7 +173,7 @@ fun InvestmentScreen(
         item {
             Text("Market Options", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
-        items(marketOptions) { option ->
+        items(items = marketOptions, key = { it.title }) { option ->
             Card(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 shape = RoundedCornerShape(14.dp)
@@ -202,7 +203,7 @@ fun InvestmentScreen(
         item {
             Text("Brokers", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
-        items(brokers) { broker ->
+        items(items = brokers, key = { it.name }) { broker ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Row(
                     modifier = Modifier
@@ -301,7 +302,7 @@ fun InvestmentScreen(
         item {
             Text("My Investments", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
-        items(investments.sortedByDescending { it.date }) { inv ->
+        items(items = sortedInvestments, key = { it.investmentId }) { inv ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text(inv.fundName ?: "-", fontWeight = FontWeight.SemiBold)
@@ -328,4 +329,3 @@ fun InvestmentScreen(
         )
     }
 }
-

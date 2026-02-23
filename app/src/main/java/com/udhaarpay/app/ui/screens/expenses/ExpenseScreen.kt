@@ -49,6 +49,7 @@ fun ExpenseScreen(
     val bankAccounts by bankAccountViewModel.accounts.collectAsState()
     val cards by creditCardViewModel.creditCards.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    val sortedExpenses = remember(expenses) { expenses.sortedByDescending { it.date } }
 
     val monthlyTotal = expenses
         .filter { SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(Date(it.date)) == currentMonth() }
@@ -75,7 +76,7 @@ fun ExpenseScreen(
         Spacer(Modifier.height(10.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(expenses.sortedByDescending { it.date }) { expense ->
+            items(items = sortedExpenses, key = { it.expenseId }) { expense ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(12.dp),

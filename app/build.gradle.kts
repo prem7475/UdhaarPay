@@ -39,7 +39,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+        kotlinCompilerExtensionVersion = "1.5.14"
+        useLiveLiterals = false
     }
     buildFeatures {
         compose = true

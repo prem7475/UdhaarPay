@@ -57,7 +57,7 @@ fun RemindersScreen() {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            items(reminders) { reminder ->
+            items(items = reminders, key = { "${it.title}-${it.dueDate}" }) { reminder ->
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),

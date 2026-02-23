@@ -120,7 +120,7 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                items(actions) { action ->
+                items(items = actions, key = { it.route }) { action ->
                     QuickActionCard(
                         action = action,
                         onClick = { onNavigate(action.route) }

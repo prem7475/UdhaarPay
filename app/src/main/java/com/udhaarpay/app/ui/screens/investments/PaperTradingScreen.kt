@@ -250,7 +250,7 @@ private fun TradingHomeScreen(
             contentPadding = PaddingValues(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(filtered) { symbol ->
+            items(items = filtered, key = { it }) { symbol ->
                 if (segment == MarketSegment.Equity) {
                     val quote = quotes[symbol]
                     if (quote == null) {
@@ -684,7 +684,7 @@ private fun HoldingsPage(holdings: List<HoldingItem>) {
         return
     }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(holdings) { item ->
+        items(items = holdings, key = { it.symbol }) { item ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text("${item.symbol} | ${item.companyName}", fontWeight = FontWeight.SemiBold)
@@ -710,7 +710,7 @@ private fun OpenTradesPage(
         return
     }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(openTrades) { trade ->
+        items(items = openTrades, key = { it.tradeId }) { trade ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text("${trade.stockSymbol} | ${trade.tradeType}", fontWeight = FontWeight.SemiBold)
@@ -734,7 +734,7 @@ private fun ClosedTradesPage(closedTrades: List<Trade>) {
         return
     }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(closedTrades) { trade ->
+        items(items = closedTrades, key = { it.tradeId }) { trade ->
             Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                 Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                     Text("${trade.stockSymbol} | ${trade.tradeType}", fontWeight = FontWeight.SemiBold)

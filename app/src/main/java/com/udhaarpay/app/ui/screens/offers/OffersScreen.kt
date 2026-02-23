@@ -92,7 +92,7 @@ fun OffersScreen() {
         Spacer(Modifier.height(8.dp))
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(filtered) { offer ->
+            items(items = filtered, key = { "${it.title}-${it.validity}" }) { offer ->
                 Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
                     Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                         Text(offer.title, fontWeight = FontWeight.SemiBold)

@@ -150,7 +150,7 @@ fun BankAccountScreen(
             }
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(accounts) { account ->
+                items(items = accounts, key = { it.accountId }) { account ->
                     val isSelected = account.accountId in selectedAccountIds
                     val isLoading = account.accountId in loadingAccountIds
                     val isRevealed = account.accountId in revealedAccountIds
