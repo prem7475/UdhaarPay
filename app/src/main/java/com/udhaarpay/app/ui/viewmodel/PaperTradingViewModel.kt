@@ -172,7 +172,7 @@ class PaperTradingViewModel @Inject constructor(
         viewModelScope.launch {
             val result = paperTradingRepository.resetAccount()
             result.onSuccess {
-                _statusMessage.value = "Paper trading account reset to INR 1,00,000"
+                _statusMessage.value = "Paper trading account reset to INR 10,00,000"
             }.onFailure {
                 _statusMessage.value = it.message ?: "Reset failed"
             }

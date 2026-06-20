@@ -379,8 +379,9 @@ class UPIPaymentViewModel @Inject constructor(
     ): PaymentDebitResult {
         val bank = bankAccounts.value.firstOrNull { it.accountId == sourceId }
             ?: return PaymentDebitResult.error("Select bank account.")
-        if (bank.upiPin.isNullOrBlank()) return PaymentDebitResult.error("Set UPI PIN for this account first.")
-        if (enteredPin != bank.upiPin) return PaymentDebitResult.error("Incorrect UPI PIN.")
+        val requiredPin = currentUser.value?.tpin?.takeIf { it.isNotBlank() } ?: bank.upiPin
+        if (requiredPin.isNullOrBlank()) return PaymentDebitResult.error("Set TPIN for bank transfers first.")
+        if (enteredPin != requiredPin) return PaymentDebitResult.error("Incorrect TPIN.")
         if (bank.balance < amount) return PaymentDebitResult.error("Insufficient bank balance.")
         bankAccountRepository.update(bank.copy(balance = bank.balance - amount))
         return PaymentDebitResult.success(accountName = bank.bankName, accountId = bank.accountId)

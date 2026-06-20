@@ -660,7 +660,7 @@ private fun PortfolioScreen(
         AlertDialog(
             onDismissRequest = { confirmReset = false },
             title = { Text("Reset Paper Trading Account") },
-            text = { Text("This will delete all paper trades and reset balance to INR 1,00,000.") },
+            text = { Text("This will delete all paper trades and reset balance to INR 10,00,000.") },
             confirmButton = {
                 UdhaarPayButton(
                     text = "Reset",

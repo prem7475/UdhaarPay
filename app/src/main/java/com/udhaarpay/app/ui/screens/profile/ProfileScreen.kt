@@ -3,22 +3,20 @@ package com.udhaarpay.app.ui.screens.profile
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,14 +27,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.udhaarpay.app.ui.components.PremiumActionCard
+import com.udhaarpay.app.ui.components.PremiumInfoCard
+import com.udhaarpay.app.ui.components.PremiumMetricCard
+import com.udhaarpay.app.ui.components.PremiumScreen
+import com.udhaarpay.app.ui.components.PremiumSectionHeader
+import com.udhaarpay.app.ui.components.UdhaarPayButton
+import com.udhaarpay.app.ui.components.UdhaarPayTextButton
 import com.udhaarpay.app.ui.viewmodel.BankAccountViewModel
 import com.udhaarpay.app.ui.viewmodel.CreditCardViewModel
 import com.udhaarpay.app.ui.viewmodel.UserProfileViewModel
@@ -61,65 +64,74 @@ fun ProfileScreen(
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) photoUrl = uri.toString()
     }
+    val scrollState = rememberScrollState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text("Profile", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(12.dp))
+    PremiumScreen {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            PremiumSectionHeader(
+                title = "Profile",
+                subtitle = "Identity, linked accounts, and local profile controls"
+            )
 
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Card(
-                modifier = Modifier
-                    .size(82.dp)
-                    .clip(CircleShape),
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                if (photoUrl.isNotBlank()) {
-                    AsyncImage(
-                        model = photoUrl,
-                        contentDescription = "Profile photo",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+            PremiumInfoCard {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    Surface(
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                        modifier = Modifier.size(76.dp)
                     ) {
-                        Text(
-                            (fullName.take(1).ifBlank { "U" }).uppercase(),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        )
+                        if (photoUrl.isNotBlank()) {
+                            AsyncImage(
+                                model = photoUrl,
+                                contentDescription = "Profile photo",
+                                modifier = Modifier.fillMaxWidth(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    (fullName.take(1).ifBlank { "U" }).uppercase(),
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 28.sp
+                                )
+                            }
+                        }
+                    }
+                    Column(modifier = Modifier.fillMaxWidth(0.7f)) {
+                        Text(fullName.ifBlank { "User Name" }, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                        Text("UPI: ${user?.upiId ?: "Not linked"}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Linked Banks: ${linkedBanks.size}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                        Text("Linked Cards: ${linkedCards.size}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                     }
                 }
             }
-            Spacer(Modifier.size(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(fullName.ifBlank { "User Name" }, style = MaterialTheme.typography.titleLarge)
-                Text("UPI: ${user?.upiId ?: "Not linked"}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text("Linked Banks: ${linkedBanks.size} | Linked Cards: ${linkedCards.size}")
+
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                PremiumMetricCard(
+                    title = "KYC",
+                    value = if (user?.kycStatus == true) "Verified" else "Pending",
+                    subtitle = "Local mock profile",
+                    modifier = Modifier.weight(1f)
+                )
+                PremiumMetricCard(
+                    title = "Security",
+                    value = if (!user?.mpin.isNullOrBlank()) "Protected" else "Setup",
+                    subtitle = "MPIN / TPIN",
+                    modifier = Modifier.weight(1f)
+                )
             }
-        }
 
-        TextButton(onClick = { photoPicker.launch("image/*") }) {
-            Text("Change Profile Photo")
-        }
-
-        Spacer(Modifier.height(8.dp))
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+            PremiumInfoCard {
+                Text("Edit Profile", fontWeight = FontWeight.SemiBold)
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
@@ -147,30 +159,40 @@ fun ProfileScreen(
                     label = { Text("Address") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
                 Spacer(Modifier.height(12.dp))
-                Button(
-                    onClick = {
-                        userViewModel.saveProfile(
-                            fullName = fullName.trim(),
-                            email = email.trim(),
-                            phone = phone.trim(),
-                            profilePhotoUrl = photoUrl.trim().ifBlank { null },
-                            address = address.trim()
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Save Profile")
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                    UdhaarPayButton(
+                        text = "Save Profile",
+                        onClick = {
+                            userViewModel.saveProfile(
+                                fullName = fullName.trim(),
+                                email = email.trim(),
+                                phone = phone.trim(),
+                                profilePhotoUrl = photoUrl.trim().ifBlank { null },
+                                address = address.trim()
+                            )
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+                    UdhaarPayButton(
+                        text = "Photo",
+                        onClick = { photoPicker.launch("image/*") },
+                        modifier = Modifier.weight(0.42f)
+                    )
                 }
             }
-        }
 
-        if (!statusMessage.isNullOrBlank()) {
-            Spacer(Modifier.height(8.dp))
-            Text(statusMessage ?: "", color = MaterialTheme.colorScheme.primary)
-            TextButton(onClick = { userViewModel.clearStatusMessage() }) {
-                Text("Dismiss")
+            PremiumActionCard(
+                title = "Security Center",
+                subtitle = "Set MPIN, TPIN, and transfer controls",
+                onClick = { /* Navigated by drawer */ }
+            )
+
+            if (!statusMessage.isNullOrBlank()) {
+                PremiumInfoCard {
+                    Text(statusMessage.orEmpty(), color = MaterialTheme.colorScheme.primary)
+                    UdhaarPayTextButton(text = "Dismiss", onClick = { userViewModel.clearStatusMessage() })
+                }
             }
         }
     }

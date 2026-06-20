@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -47,6 +48,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.udhaarpay.app.data.local.entities.BankAccount
+import com.udhaarpay.app.ui.components.PremiumActionCard
+import com.udhaarpay.app.ui.components.PremiumInfoCard
+import com.udhaarpay.app.ui.components.PremiumMetricCard
+import com.udhaarpay.app.ui.components.PremiumScreen
+import com.udhaarpay.app.ui.components.PremiumSectionHeader
 import com.udhaarpay.app.ui.components.UdhaarPayButton
 import com.udhaarpay.app.ui.viewmodel.BankAccountViewModel
 
@@ -76,161 +82,140 @@ fun BankAccountScreen(
 
     val totalVisible = revealedAccountIds.isNotEmpty()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text("My Bank Accounts", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-        Spacer(Modifier.height(10.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+    PremiumScreen {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                Text("Total Balance (All Linked Accounts)")
-                if (totalVisible) {
-                    Text(
-                        "INR ${"%.2f".format(totalBalance)}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
+            item {
+                PremiumSectionHeader(
+                    title = "Bank Accounts",
+                    subtitle = "Track balances, reveal them securely, and keep passbooks close at hand"
+                )
+            }
+
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                    PremiumMetricCard(
+                        title = "Linked",
+                        value = "${accounts.size}",
+                        subtitle = "Accounts",
+                        modifier = Modifier.weight(1f)
                     )
-                } else {
-                    Text("INR ••••••", fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                    Text("Tap reveal on any account to unmask balances.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                    PremiumMetricCard(
+                        title = "Balance",
+                        value = if (totalVisible) "INR ${"%,.0f".format(totalBalance)}" else "Locked",
+                        subtitle = if (totalVisible) "Total visible" else "Tap reveal",
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-                Text("Accounts linked: ${accounts.size}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                if (selectedAccountIds.size >= 2) {
-                    Spacer(Modifier.height(8.dp))
-                    if (selectedAccountIds.all { it in revealedAccountIds }) {
+            }
+
+            item {
+                PremiumInfoCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("Quick actions", fontWeight = FontWeight.SemiBold)
                         Text(
-                            "Selected (${selectedAccountIds.size}) Total: INR ${"%.2f".format(animatedSelectedTotal)}",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    } else {
-                        Text(
-                            "Selected total hidden (PIN protected).",
+                            "Choose a few accounts, reveal balances with PIN, or jump to the passbook for details.",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp
                         )
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                            UdhaarPayButton(text = "Add Account", onClick = { showAddDialog = true }, modifier = Modifier.weight(1f))
+                            UdhaarPayButton(
+                                text = "Check Balance",
+                                onClick = {
+                                    if (selectedAccountIds.isEmpty()) {
+                                        viewModel.checkAllBalances()
+                                    } else {
+                                        accounts.filter { it.accountId in selectedAccountIds }
+                                            .forEach { viewModel.checkBalance(it) }
+                                    }
+                                },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
-                Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    UdhaarPayButton(text = "Add Account", onClick = { showAddDialog = true })
-                    UdhaarPayButton(
-                        text = "Check Balance",
-                        onClick = {
-                            if (selectedAccountIds.isEmpty()) {
-                                viewModel.checkAllBalances()
-                            } else {
-                                accounts.filter { it.accountId in selectedAccountIds }
-                                    .forEach { viewModel.checkBalance(it) }
-                            }
+            }
+
+            if (!statusMessage.isNullOrBlank()) {
+                item {
+                    PremiumInfoCard {
+                        Text(statusMessage ?: "", color = MaterialTheme.colorScheme.primary)
+                        TextButton(onClick = { viewModel.clearStatusMessage() }) {
+                            Text("Dismiss")
                         }
-                    )
+                    }
                 }
             }
-        }
 
-        if (!statusMessage.isNullOrBlank()) {
-            Spacer(Modifier.height(8.dp))
-            Text(statusMessage ?: "", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp)
-            TextButton(onClick = { viewModel.clearStatusMessage() }) {
-                Text("Dismiss")
-            }
-        }
-
-        Spacer(Modifier.height(10.dp))
-        if (accounts.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No bank accounts yet. Add your first account.")
-            }
-        } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (accounts.isEmpty()) {
+                item {
+                    PremiumInfoCard {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                            Text("No bank accounts yet", fontWeight = FontWeight.SemiBold)
+                            Text("Add your first account to unlock balance checks and passbooks.", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                        }
+                    }
+                }
+            } else {
                 items(items = accounts, key = { it.accountId }) { account ->
                     val isSelected = account.accountId in selectedAccountIds
                     val isLoading = account.accountId in loadingAccountIds
                     val isRevealed = account.accountId in revealedAccountIds
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isSelected) {
-                                MaterialTheme.colorScheme.primaryContainer
-                            } else {
-                                MaterialTheme.colorScheme.surfaceVariant
-                            }
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Checkbox(
-                                checked = isSelected,
-                                onCheckedChange = { checked ->
-                                    selectedAccountIds = if (checked) {
-                                        selectedAccountIds + account.accountId
-                                    } else {
-                                        selectedAccountIds - account.accountId
-                                    }
-                                }
-                            )
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(account.bankName, fontWeight = FontWeight.Bold)
-                                Text("${account.accountType} | ${account.accountNumber}")
-                                Text("IFSC: ${account.ifscCode}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Text(
-                                    "Nickname: ${account.nickname ?: "-"}",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 12.sp
-                                )
-                                Text(
-                                    if (isRevealed) {
-                                        "Balance: INR ${"%.2f".format(account.balance)}"
-                                    } else {
-                                        "Balance: INR ••••••"
-                                    }
-                                )
-                            }
-                            Column(horizontalAlignment = Alignment.End) {
-                                if (isLoading) {
-                                    CircularProgressIndicator(modifier = Modifier.height(20.dp), strokeWidth = 2.dp)
-                                } else {
-                                    TextButton(onClick = { viewModel.checkBalance(account) }) {
-                                        Text("Check")
-                                    }
-                                }
-                                IconButton(
-                                    onClick = {
-                                        if (isRevealed) {
-                                            revealedAccountIds = revealedAccountIds - account.accountId
+                    PremiumInfoCard {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                                Checkbox(
+                                    checked = isSelected,
+                                    onCheckedChange = { checked ->
+                                        selectedAccountIds = if (checked) {
+                                            selectedAccountIds + account.accountId
                                         } else {
-                                            accountToReveal = account
+                                            selectedAccountIds - account.accountId
                                         }
                                     }
-                                ) {
-                                    Icon(
-                                        if (isRevealed) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                        contentDescription = "Toggle balance visibility"
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(account.bankName, fontWeight = FontWeight.Bold)
+                                    Text("${account.accountType} | ${account.accountNumber}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                                    Text("IFSC ${account.ifscCode}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                                }
+                                TextButton(onClick = { onOpenPassbook(account.accountId) }) { Text("Passbook") }
+                            }
+
+                            Card(
+                                shape = RoundedCornerShape(18.dp),
+                                colors = CardDefaults.cardColors(containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant)
+                            ) {
+                                Column(modifier = Modifier.fillMaxWidth().padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Text("Nickname: ${account.nickname ?: "-"}", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                                    Text(
+                                        if (isRevealed) "Balance: INR ${"%.2f".format(account.balance)}" else "Balance: INR **** **",
+                                        fontWeight = FontWeight.SemiBold
                                     )
-                                }
-                                Row {
-                                    IconButton(onClick = { accountToEdit = account }) {
-                                        Icon(Icons.Default.Edit, contentDescription = "Edit nickname")
+                                    if (isLoading) {
+                                        CircularProgressIndicator(modifier = Modifier.height(18.dp), strokeWidth = 2.dp)
+                                    } else {
+                                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                                            TextButton(
+                                                onClick = {
+                                                    if (isRevealed) {
+                                                        revealedAccountIds = revealedAccountIds - account.accountId
+                                                    } else {
+                                                        accountToReveal = account
+                                                    }
+                                                }
+                                            ) { Text(if (isRevealed) "Hide" else "Reveal") }
+                                            TextButton(onClick = { accountToEdit = account }) { Text("Edit") }
+                                            TextButton(onClick = { viewModel.deleteBankAccount(account) }) { Text("Delete") }
+                                        }
                                     }
-                                    IconButton(onClick = { viewModel.deleteBankAccount(account) }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+                                    if (isRevealed) {
+                                        Text("Visible balance mode enabled", color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp)
                                     }
-                                }
-                                TextButton(onClick = { onOpenPassbook(account.accountId) }) {
-                                    Text("Passbook")
                                 }
                             }
                         }

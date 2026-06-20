@@ -177,6 +177,7 @@ fun CreditCardScreen(
                                             val outstanding = (card.limit - card.balance).coerceAtLeast(0.0)
                                             Text("Outstanding: INR ${"%.2f".format(outstanding)}")
                                             Text("Limit: INR ${"%.2f".format(card.limit)}")
+                                            Text("Due: ${formatCardDueDate(card)}")
                                         } else {
                                             Text("Outstanding: INR •••••")
                                             Text("Limit: INR •••••")
@@ -381,4 +382,10 @@ fun CreditCardScreen(
             }
         )
     }
+}
+
+private fun formatCardDueDate(card: CreditCard): String {
+    return card.billDueDateMillis?.let {
+        java.text.SimpleDateFormat("dd MMM yyyy", java.util.Locale.getDefault()).format(java.util.Date(it))
+    } ?: "Not scheduled"
 }

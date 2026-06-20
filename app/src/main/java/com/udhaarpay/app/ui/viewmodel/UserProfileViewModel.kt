@@ -66,6 +66,27 @@ class UserProfileViewModel @Inject constructor(
         }
     }
 
+    fun saveSecurityCredentials(mpin: String, tpin: String) {
+        viewModelScope.launch {
+            val existing = currentUser.value ?: defaultProfile()
+            userProfileDao.insert(
+                existing.copy(
+                    mpin = mpin.take(6),
+                    tpin = tpin.take(6)
+                )
+            )
+            _statusMessage.value = "Security credentials updated"
+        }
+    }
+
+    fun verifyMpin(mpin: String): Boolean {
+        return currentUser.value?.mpin == mpin && mpin.isNotBlank()
+    }
+
+    fun verifyTpin(tpin: String): Boolean {
+        return currentUser.value?.tpin == tpin && tpin.isNotBlank()
+    }
+
     fun linkUpiToPhone(phone: String) {
         viewModelScope.launch {
             if (phone.isBlank()) {
@@ -108,7 +129,9 @@ class UserProfileViewModel @Inject constructor(
             panNumber = "",
             aadhaarNumber = "",
             kycStatus = false,
-            kycDate = null
+            kycDate = null,
+            mpin = null,
+            tpin = null
         )
     }
 }

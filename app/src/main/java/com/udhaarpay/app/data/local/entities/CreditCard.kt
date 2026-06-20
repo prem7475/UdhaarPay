@@ -13,5 +13,7 @@ data class CreditCard(
     val limit: Double,
     val expiry: String,
     val status: String,
-    val upiLinked: Boolean
+    val upiLinked: Boolean,
+    val billDueDateMillis: Long? = null,
+    val minimumDue: Double = 0.0
 )

@@ -10,11 +10,11 @@ import androidx.compose.ui.graphics.Color
 private val DarkLuxuryColorScheme = darkColorScheme(
     primary = KotakRed500,
     onPrimary = OnDarkPrimary,
-    primaryContainer = KotakRed700,
+    primaryContainer = Color(0xFF2A2210),
     onPrimaryContainer = OnDarkPrimary,
-    secondary = WhiteMuted,
-    onSecondary = Coal900,
-    tertiary = WhiteSoft,
+    secondary = PremiumBlue,
+    onSecondary = Coal950,
+    tertiary = KotakRed300,
     onTertiary = Coal950,
     background = Coal950,
     onBackground = OnDarkPrimary,
@@ -30,10 +30,10 @@ private val DarkLuxuryColorScheme = darkColorScheme(
 private val LightLuxuryColorScheme = lightColorScheme(
     primary = KotakRed600,
     onPrimary = White100,
-    primaryContainer = Color(0xFFFFE3E5),
-    onPrimaryContainer = Color(0xFF4A0003),
-    secondary = KotakRed500,
-    onSecondary = White100,
+    primaryContainer = Color(0xFFFFF1D7),
+    onPrimaryContainer = Color(0xFF42300A),
+    secondary = PremiumBlue,
+    onSecondary = Coal950,
     tertiary = Coal900,
     onTertiary = White100,
     background = White100,
@@ -49,19 +49,27 @@ private val LightLuxuryColorScheme = lightColorScheme(
 
 object UdhaarPayBrushes {
     val AppBackground = Brush.verticalGradient(
-        colors = listOf(Coal950, Coal900, Color(0xFF22080E))
+        colors = listOf(Coal950, Coal900, Color(0xFF17111A))
     )
 
     val PremiumCard = Brush.linearGradient(
-        colors = listOf(Coal850, Color(0xFF2F0A11), Coal900)
+        colors = listOf(Coal850, Color(0xFF201A12), Coal900)
     )
 
     val AccentGlow = Brush.linearGradient(
-        colors = listOf(KotakRed300, KotakRed500, KotakRed700)
+        colors = listOf(KotakRed200, KotakRed500, KotakRed700)
     )
 
     val PrimaryButton = Brush.horizontalGradient(
-        colors = listOf(KotakRed700, KotakRed500)
+        colors = listOf(KotakRed700, KotakRed500, KotakRed300)
+    )
+
+    val SoftSheen = Brush.verticalGradient(
+        colors = listOf(
+            Color.White.copy(alpha = 0.12f),
+            Color.Transparent,
+            Color.Black.copy(alpha = 0.06f)
+        )
     )
 }
 

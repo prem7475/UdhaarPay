@@ -82,6 +82,7 @@ import com.udhaarpay.app.ui.screens.creditcards.CreditCardScreen
 import com.udhaarpay.app.ui.screens.debt.DebtScreen
 import com.udhaarpay.app.ui.screens.expenses.ExpenseScreen
 import com.udhaarpay.app.ui.screens.home.HomeScreen
+import com.udhaarpay.app.ui.screens.insights.InsightsScreen
 import com.udhaarpay.app.ui.screens.insurance.InsuranceScreen
 import com.udhaarpay.app.ui.screens.investments.InvestmentsNavHost
 import com.udhaarpay.app.ui.screens.investments.InvestmentRoute
@@ -92,6 +93,7 @@ import com.udhaarpay.app.ui.screens.profile.ProfileScreen
 import com.udhaarpay.app.ui.screens.reminders.RemindersScreen
 import com.udhaarpay.app.ui.screens.scanpay.ScanPayScreen
 import com.udhaarpay.app.ui.screens.support.SupportScreen
+import com.udhaarpay.app.ui.screens.security.SecurityCenterScreen
 import com.udhaarpay.app.ui.screens.tickets.TicketScreen
 import com.udhaarpay.app.ui.screens.transactions.PassbookScreen
 import com.udhaarpay.app.ui.screens.transactions.TransactionsScreen
@@ -145,7 +147,9 @@ fun UdhaarPayAppShell() {
         DrawerItem("Mobile Recharge", AppRoute.MobileRecharge.route),
         DrawerItem("Invest", AppRoute.Invest.route),
         DrawerItem("Market News", AppRoute.InvestNews.route),
+        DrawerItem("Insights", AppRoute.Insights.route),
         DrawerItem("Tickets", AppRoute.Tickets.route),
+        DrawerItem("Bookings", AppRoute.Bookings.route),
         DrawerItem("Bank Accounts", AppRoute.BankAccounts.route),
         DrawerItem("Credit Cards", AppRoute.CreditCard.route),
         DrawerItem("Insurance", AppRoute.Insurance.route),
@@ -157,6 +161,7 @@ fun UdhaarPayAppShell() {
         DrawerItem("Link UPI", AppRoute.LinkUpi.route),
         DrawerItem("Reminders", AppRoute.Reminders.route),
         DrawerItem("Wallet", AppRoute.WalletManagement.route),
+        DrawerItem("Security", AppRoute.Security.route),
         DrawerItem("Support", AppRoute.Support.route)
     )
 
@@ -226,13 +231,13 @@ fun UdhaarPayAppShell() {
             }
         }
     ) {
-        Scaffold(
+            Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
                         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                             Text(
-                                "UDHaaRPay",
+                                "UdhaarPay",
                                 fontWeight = FontWeight.Bold,
                                 letterSpacing = 1.sp,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -240,7 +245,7 @@ fun UdhaarPayAppShell() {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+                        containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.88f),
                         navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                     ),
                     navigationIcon = {
@@ -284,7 +289,16 @@ fun UdhaarPayAppShell() {
                                 }
                             }
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.Message, contentDescription = "Contacts & pay")
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
+                                modifier = Modifier.size(38.dp)
+                            ) {
+                                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                                    Icon(Icons.AutoMirrored.Filled.Message, contentDescription = "Contacts & pay")
+                                }
+                            }
                         }
                     },
                     modifier = Modifier.padding(bottom = 2.dp)
@@ -293,34 +307,44 @@ fun UdhaarPayAppShell() {
             bottomBar = {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
-                    tonalElevation = topElevation
+                Surface(
+                    shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.86f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.18f)),
+                    shadowElevation = topElevation,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
-                    bottomItems.forEach { item ->
-                        val selected = when (item.route) {
-                            AppRoute.Profile.route -> currentRoute in listOf(AppRoute.Profile.route, AppRoute.Account.route)
-                            AppRoute.Debt.route -> currentRoute in listOf(AppRoute.Debt.route, AppRoute.Expenses.route)
-                            else -> currentRoute == item.route
+                    NavigationBar(
+                        containerColor = Color.Transparent,
+                        tonalElevation = 0.dp
+                    ) {
+                        bottomItems.forEach { item ->
+                            val selected = when (item.route) {
+                                AppRoute.Profile.route -> currentRoute in listOf(AppRoute.Profile.route, AppRoute.Account.route)
+                                AppRoute.Debt.route -> currentRoute in listOf(AppRoute.Debt.route, AppRoute.Expenses.route)
+                                else -> currentRoute == item.route
+                            }
+                            NavigationBarItem(
+                                selected = selected,
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    navController.navigate(item.route) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                ),
+                                icon = { Icon(item.icon, contentDescription = item.title, modifier = Modifier.size(22.dp)) },
+                                label = { Text(item.title, fontSize = 11.sp) }
+                            )
                         }
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                navController.navigate(item.route) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f),
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            ),
-                            icon = { Icon(item.icon, contentDescription = item.title) },
-                            label = { Text(item.title) }
-                        )
                     }
                 }
             }
@@ -401,7 +425,9 @@ private fun AppNavHost(navController: NavHostController) {
         composable(AppRoute.InvestNews.route) {
             InvestmentsNavHost(startDestination = InvestmentRoute.News.route)
         }
+        composable(AppRoute.Insights.route) { InsightsScreen() }
         composable(AppRoute.Tickets.route) { TicketScreen() }
+        composable(AppRoute.Bookings.route) { TicketScreen() }
         composable(AppRoute.CreditCard.route) {
             CreditCardScreen(
                 onNavigateHome = {
@@ -424,6 +450,7 @@ private fun AppNavHost(navController: NavHostController) {
         composable(AppRoute.Profile.route) { ProfileScreen() }
         composable(AppRoute.LinkUpi.route) { LinkUPIScreen() }
         composable(AppRoute.WalletManagement.route) { WalletManagementScreen() }
+        composable(AppRoute.Security.route) { SecurityCenterScreen() }
         composable(AppRoute.Reminders.route) { RemindersScreen() }
         composable(AppRoute.Support.route) { SupportScreen() }
         composable(AppRoute.Transactions.route) { TransactionsScreen() }

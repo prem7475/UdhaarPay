@@ -3,6 +3,8 @@ package com.udhaarpay.app.data
 import com.udhaarpay.app.data.local.entities.*
 
 object MockDataProvider {
+    private val seedNow = System.currentTimeMillis()
+
     val userProfiles = listOf(
         UserProfile(
             userId = "1",
@@ -16,11 +18,14 @@ object MockDataProvider {
             state = "Delhi",
             pincode = "110001",
             upiId = "9876543210@udhaarpay",
+            mpin = "2468",
+            tpin = "8642",
+            walletPinFreeLimit = 2500.0,
             profilePhotoUrl = "https://randomuser.me/api/portraits/men/1.jpg",
             panNumber = "ABCDE1234F",
             aadhaarNumber = "123412341234",
             kycStatus = true,
-            kycDate = 1672531200000L // 2023-01-01 in millis
+            kycDate = 1672531200000L
         ),
         UserProfile(
             userId = "2",
@@ -34,6 +39,8 @@ object MockDataProvider {
             state = "Maharashtra",
             pincode = "400001",
             upiId = "9988776655@udhaarpay",
+            mpin = null,
+            tpin = null,
             profilePhotoUrl = "https://randomuser.me/api/portraits/women/2.jpg",
             panNumber = "PQRSX5678Y",
             aadhaarNumber = "432143214321",
@@ -48,9 +55,10 @@ object MockDataProvider {
             accountNumber = "1234567890",
             ifscCode = "SBIN0001234",
             accountType = "Savings",
-            balance = 15000.0,
-            nickname = "Salary Account",
-            addedDate = 1672531200000L
+            balance = 275000.0,
+            upiPin = "2468",
+            nickname = "Salary Vault",
+            addedDate = seedNow - 86_400_000L * 45
         ),
         BankAccount(
             accountId = 2L,
@@ -58,9 +66,10 @@ object MockDataProvider {
             accountNumber = "9876543210",
             ifscCode = "HDFC0005678",
             accountType = "Current",
-            balance = 25000.0,
-            nickname = "Business Account",
-            addedDate = 1672531200000L
+            balance = 182500.0,
+            upiPin = "2468",
+            nickname = "Luxury Spends",
+            addedDate = seedNow - 86_400_000L * 28
         )
     )
     val creditCards = listOf(
@@ -69,22 +78,39 @@ object MockDataProvider {
             cardNumber = "4111111111111111",
             cardType = "Visa",
             issuer = "SBI",
-            balance = 10000.0,
+            balance = 6345.93,
             limit = 50000.0,
             expiry = "12/28",
             status = "Active",
-            upiLinked = true
+            upiLinked = false,
+            billDueDateMillis = seedNow + 86_400_000L * 12,
+            minimumDue = 2100.0
         ),
         CreditCard(
             cardId = 2L,
             cardNumber = "5555555555554444",
             cardType = "Mastercard",
             issuer = "HDFC",
-            balance = 15000.0,
-            limit = 60000.0,
+            balance = 19515.56,
+            limit = 70000.0,
             expiry = "11/27",
             status = "Active",
-            upiLinked = true
+            upiLinked = false,
+            billDueDateMillis = seedNow + 86_400_000L * 16,
+            minimumDue = 3200.0
+        ),
+        CreditCard(
+            cardId = 3L,
+            cardNumber = "6078951234567890",
+            cardType = "RuPay",
+            issuer = "Kotak",
+            balance = 30483.93,
+            limit = 120000.0,
+            expiry = "09/29",
+            status = "Active",
+            upiLinked = true,
+            billDueDateMillis = seedNow + 86_400_000L * 9,
+            minimumDue = 5000.0
         )
     )
     val upiPayments = listOf(
@@ -93,7 +119,7 @@ object MockDataProvider {
             senderUPI = "amit@upi",
             recipientUPI = "priya@upi",
             amount = 1000.0,
-            date = 1640995200000L,
+            date = seedNow - 86_400_000L * 5,
             message = "Rent",
             status = "Success",
             type = "sent"
@@ -103,7 +129,7 @@ object MockDataProvider {
             senderUPI = "priya@upi",
             recipientUPI = "amit@upi",
             amount = 500.0,
-            date = 1641081600000L,
+            date = seedNow - 86_400_000L * 4,
             message = "Groceries",
             status = "Success",
             type = "sent"
@@ -115,7 +141,7 @@ object MockDataProvider {
             personName = "Amit Kumar",
             amount = 2000.0,
             type = "given",
-            date = 1641168000000L,
+            date = seedNow - 86_400_000L * 12,
             reason = "Dinner",
             status = "pending",
             settledDate = null,
@@ -126,10 +152,10 @@ object MockDataProvider {
             personName = "Priya Sharma",
             amount = 1500.0,
             type = "taken",
-            date = 1641254400000L,
+            date = seedNow - 86_400_000L * 10,
             reason = "Cab",
             status = "settled",
-            settledDate = 1641340800000L,
+            settledDate = seedNow - 86_400_000L * 8,
             amountSettled = 1500.0
         )
     )
@@ -142,7 +168,7 @@ object MockDataProvider {
             account = "SBI",
             accountName = "Amit Kumar",
             description = "Lunch",
-            date = 1641340800000L,
+            date = seedNow - 86_400_000L * 3,
             month = "January",
             receiptUrl = null
         ),
@@ -154,7 +180,7 @@ object MockDataProvider {
             account = "HDFC",
             accountName = "Priya Sharma",
             description = "Clothes",
-            date = 1641427200000L,
+            date = seedNow - 86_400_000L * 2,
             month = "January",
             receiptUrl = null
         )
@@ -167,7 +193,7 @@ object MockDataProvider {
             destination = "DEL-MUM",
             cinema = null,
             provider = "IndiGo",
-            date = 1641513600000L,
+            date = seedNow - 86_400_000L * 8,
             seats = "1A",
             amount = 5000.0,
             status = "Confirmed"
@@ -179,7 +205,7 @@ object MockDataProvider {
             destination = "MUM-DEL",
             cinema = null,
             provider = "IRCTC",
-            date = 1641600000000L,
+            date = seedNow - 86_400_000L * 6,
             seats = "S2",
             amount = 1500.0,
             status = "Pending"
@@ -193,7 +219,7 @@ object MockDataProvider {
             type = "sip",
             amount = 10000.0,
             frequency = "monthly",
-            date = 1641686400000L,
+            date = seedNow - 86_400_000L * 40,
             currentValue = 12000.0,
             returns = 2000.0
         ),
@@ -204,7 +230,7 @@ object MockDataProvider {
             type = "mutual",
             amount = 15000.0,
             frequency = "monthly",
-            date = 1641772800000L,
+            date = seedNow - 86_400_000L * 32,
             currentValue = 18000.0,
             returns = 3000.0
         )
@@ -215,8 +241,8 @@ object MockDataProvider {
             policyType = "Health",
             provider = "LIC",
             premium = 5000.0,
-            startDate = 1641859200000L,
-            expiryDate = 1644451200000L,
+            startDate = seedNow - 86_400_000L * 365,
+            expiryDate = seedNow + 86_400_000L * 365,
             status = "Active",
             coverage = "Comprehensive"
         ),
@@ -225,8 +251,8 @@ object MockDataProvider {
             policyType = "Life",
             provider = "HDFC Life",
             premium = 8000.0,
-            startDate = 1641945600000L,
-            expiryDate = 1644537600000L,
+            startDate = seedNow - 86_400_000L * 420,
+            expiryDate = seedNow + 86_400_000L * 245,
             status = "Active",
             coverage = "Term"
         )

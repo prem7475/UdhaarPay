@@ -201,7 +201,7 @@ class PaperTradingRepository @Inject constructor(
     }
 
     companion object {
-        const val STARTING_BALANCE = 100000.0
+        const val STARTING_BALANCE = 1_000_000.0
         const val TYPE_BUY = "BUY"
         const val TYPE_SELL = "SELL"
         const val TYPE_CALL = "CALL"

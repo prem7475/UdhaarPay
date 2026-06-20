@@ -10,10 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,6 +31,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.udhaarpay.app.ui.components.PremiumInfoCard
+import com.udhaarpay.app.ui.components.PremiumMetricCard
+import com.udhaarpay.app.ui.components.PremiumPill
+import com.udhaarpay.app.ui.components.PremiumScreen
+import com.udhaarpay.app.ui.components.PremiumSectionHeader
 import com.udhaarpay.app.ui.viewmodel.DebtViewModel
 import com.udhaarpay.app.ui.viewmodel.ExpenseViewModel
 import com.udhaarpay.app.ui.viewmodel.NFCTransactionViewModel
@@ -150,112 +156,141 @@ fun TransactionsScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text("Passbook & Transactions", fontWeight = FontWeight.Bold, fontSize = 24.sp)
-        Text(
-            "All local-device transactions in one view",
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontSize = 12.sp
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+    val categorySummary = remember(expenses) {
+        expenses.groupBy { it.category.ifBlank { "Miscellaneous" } }
+            .mapValues { (_, values) -> values.sumOf { it.amount } }
+            .entries.sortedByDescending { it.value }
+    }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+    PremiumScreen {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            SummaryStat(
-                title = "Credit",
-                value = "INR ${"%.2f".format(totalCredit)}",
-                modifier = Modifier.weight(1f)
-            )
-            SummaryStat(
-                title = "Debit",
-                value = "INR ${"%.2f".format(totalDebit)}",
-                modifier = Modifier.weight(1f)
-            )
-            SummaryStat(
-                title = "Net",
-                value = "${if (netFlow >= 0.0) "+" else "-"}INR ${"%.2f".format(abs(netFlow))}",
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it.take(40) },
-            singleLine = true,
-            label = { Text("Search by title or counterparty") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            TransactionFilter.entries.forEach { filter ->
-                FilterChip(
-                    selected = selectedFilter == filter,
-                    onClick = { selectedFilter = filter },
-                    label = { Text(filter.title) }
+            item {
+                PremiumSectionHeader(
+                    title = "Transactions",
+                    subtitle = "Passbook, categories, and net cash flow"
                 )
             }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            "${filteredEntries.size} transactions",
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(8.dp))
 
-        if (filteredEntries.isEmpty()) {
-            Text(
-                if (passbookEntries.isEmpty()) "No transactions available yet."
-                else "No transactions match your search/filter.",
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+            item {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                    PremiumMetricCard(
+                        title = "Credit",
+                        value = "INR ${"%,.0f".format(totalCredit)}",
+                        subtitle = "Incoming",
+                        modifier = Modifier.weight(1f)
+                    )
+                    PremiumMetricCard(
+                        title = "Debit",
+                        value = "INR ${"%,.0f".format(totalDebit)}",
+                        subtitle = "Outgoing",
+                        modifier = Modifier.weight(1f)
+                    )
+                    PremiumMetricCard(
+                        title = "Net",
+                        value = "${if (netFlow >= 0.0) "+" else "-"}INR ${"%,.0f".format(abs(netFlow))}",
+                        subtitle = "After dues",
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            item {
+                PremiumInfoCard {
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it.take(40) },
+                            singleLine = true,
+                            label = { Text("Search by title or counterparty") },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState()),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            TransactionFilter.entries.forEach { filter ->
+                                PremiumPill(
+                                    text = filter.title,
+                                    selected = selectedFilter == filter
+                                ) { selectedFilter = filter }
+                            }
+                        }
+                        Text(
+                            "${filteredEntries.size} matching transactions",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+            item {
+                PremiumSectionHeader(
+                    title = "Category Split",
+                    subtitle = "Food, travel, salary, shopping, and more"
+                )
+            }
+
+            item {
+                PremiumInfoCard {
+                    if (categorySummary.isEmpty()) {
+                        Text("No category data yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        categorySummary.take(6).forEach { (category, amount) ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(category, fontWeight = FontWeight.SemiBold)
+                                Text("INR ${"%,.0f".format(amount)}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                    }
+                }
+            }
+
+            item {
+                PremiumSectionHeader(
+                    title = "Passbook",
+                    subtitle = "Latest local transactions"
+                )
+            }
+
+            if (filteredEntries.isEmpty()) {
+                item {
+                    PremiumInfoCard {
+                        Text(
+                            if (passbookEntries.isEmpty()) "No transactions available yet."
+                            else "No transactions match your search or filter.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
                 itemsIndexed(
                     items = filteredEntries,
                     key = { index, entry -> "${entry.date}-${entry.title}-${entry.subtitle}-${index}" }
                 ) { _, entry ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                    ) {
+                    PremiumInfoCard {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                            Column(modifier = Modifier.fillMaxWidth(0.72f)) {
+                                Text(entry.title, fontWeight = FontWeight.SemiBold)
+                                Text(entry.subtitle, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                                 Text(
-                                    entry.title,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                Text(
-                                    entry.subtitle,
+                                    SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault()).format(Date(entry.date)),
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 12.sp
-                                )
-                                Text(
-                                    SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.getDefault())
-                                        .format(Date(entry.date)),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 12.sp
+                                    fontSize = 11.sp
                                 )
                             }
                             Text(
@@ -267,31 +302,6 @@ fun TransactionsScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun SummaryStat(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-    ) {
-        Column(modifier = Modifier.padding(10.dp)) {
-            Text(
-                title,
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                value,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 12.sp
-            )
         }
     }
 }

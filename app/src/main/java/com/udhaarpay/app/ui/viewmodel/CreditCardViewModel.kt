@@ -153,7 +153,9 @@ class CreditCardViewModel @Inject constructor(
                     limit = limit,
                     expiry = expiry,
                     status = "active",
-                    upiLinked = detectedType.equals("RuPay", true)
+                    upiLinked = detectedType.equals("RuPay", true),
+                    billDueDateMillis = System.currentTimeMillis() + 86_400_000L * 15,
+                    minimumDue = (limit * 0.05).coerceAtLeast(500.0)
                 )
             )
             _statusMessage.value = if (detectedType == "RuPay") {

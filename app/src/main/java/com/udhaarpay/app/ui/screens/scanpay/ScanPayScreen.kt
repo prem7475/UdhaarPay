@@ -66,6 +66,7 @@ import com.google.zxing.RGBLuminanceSource
 import com.google.zxing.common.HybridBinarizer
 import com.udhaarpay.app.ui.components.UdhaarPayButton
 import com.udhaarpay.app.ui.components.UdhaarPayTextButton
+import com.udhaarpay.app.ui.components.PremiumScreen
 import com.udhaarpay.app.ui.screens.nfc.NFCPaymentScreen
 import com.udhaarpay.app.ui.viewmodel.NFCPaymentViewModel
 import com.udhaarpay.app.ui.viewmodel.PaymentContact
@@ -93,6 +94,7 @@ fun ScanPayScreen(
 
     var selectedMode by remember { mutableStateOf(ScanPayMode.Scan) }
     var scannedResult by remember { mutableStateOf<String?>(null) }
+    var parsedQr by remember { mutableStateOf<ParsedQrPayment?>(null) }
     var selectedContact by remember { mutableStateOf<PaymentContact?>(null) }
     var accountNumber by remember { mutableStateOf("") }
     var ifsc by remember { mutableStateOf("") }
@@ -133,97 +135,99 @@ fun ScanPayScreen(
         scannedResult = decodeQrFromBitmap(bitmap)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        MaterialTheme.colorScheme.background,
-                        MaterialTheme.colorScheme.surface,
-                        MaterialTheme.colorScheme.background
-                    )
-                )
-            )
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    LaunchedEffect(scannedResult) {
+        parsedQr = scannedResult?.let { parseUpiQrPayload(it) }
+        if (selectedMode == ScanPayMode.Scan && parsedQr?.merchantCategory != "Personal") {
+            category = parsedQr?.merchantCategory ?: category
+        }
+    }
+
+    LaunchedEffect(parsedQr?.raw, selectedMode, cards, accounts, wallet) {
+        if (selectedMode == ScanPayMode.Scan && parsedQr != null) {
+            sourceType = when {
+                parsedQr?.isMerchant == true && cards.any { it.cardType.equals("rupay", true) } -> "card"
+                wallet != null -> "wallet"
+                else -> "bank"
+            }
+        }
+    }
+
+    PremiumScreen(contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Column {
-                Text("Scan & Pay", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
-                Text("Smart UPI payments with local security", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+                    Text("Scan & Pay", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    Text("Merchant QR, personal QR, and NFC in one calm flow", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
+                }
+                IconButton(onClick = { showMessageDialog = true }) {
+                    Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Message contacts")
+                }
             }
-            IconButton(onClick = { showMessageDialog = true }) {
-                Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Message contacts")
-            }
-        }
 
-        Spacer(Modifier.height(10.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            ScanPayMode.entries.forEach { mode ->
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clickable { selectedMode = mode },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (selectedMode == mode) {
-                            MaterialTheme.colorScheme.primaryContainer
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                ScanPayMode.entries.forEach { mode ->
+                    Card(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { selectedMode = mode },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (selectedMode == mode) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            }
+                        )
+                    ) {
+                        Text(
+                            mode.label,
+                            modifier = Modifier.padding(vertical = 12.dp, horizontal = 10.dp),
+                            fontSize = 12.sp,
+                            fontWeight = if (selectedMode == mode) FontWeight.SemiBold else FontWeight.Normal
+                        )
+                    }
+                }
+            }
+
+            when (selectedMode) {
+                ScanPayMode.Scan -> {
+                    AnimatedScanButton(onScan = { cameraLauncher.launch(null) })
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                        UdhaarPayButton(
+                            text = "Scan QR from Camera",
+                            onClick = { cameraLauncher.launch(null) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        UdhaarPayButton(
+                            text = "Scan from Gallery",
+                            onClick = { galleryLauncher.launch("image/*") },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    if (!scannedResult.isNullOrBlank()) {
+                        Text("Scanned: $scannedResult", color = MaterialTheme.colorScheme.secondary)
+                        parsedQr?.let { qr ->
+                            ParsedQrCard(qr = qr)
                         }
-                    )
-                ) {
-                    Text(
-                        mode.label,
-                        modifier = Modifier.padding(10.dp),
-                        fontSize = 12.sp,
-                        fontWeight = if (selectedMode == mode) FontWeight.SemiBold else FontWeight.Normal
-                    )
+                    }
                 }
-            }
-        }
 
-        Spacer(Modifier.height(12.dp))
-        when (selectedMode) {
-            ScanPayMode.Scan -> {
-                AnimatedScanButton(onScan = { cameraLauncher.launch(null) })
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    UdhaarPayButton(
-                        text = "Scan QR from Camera",
-                        onClick = { cameraLauncher.launch(null) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    UdhaarPayButton(
-                        text = "Scan from Gallery",
-                        onClick = { galleryLauncher.launch("image/*") },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                if (!scannedResult.isNullOrBlank()) {
-                    Spacer(Modifier.height(8.dp))
-                    Text("Scanned: $scannedResult", color = MaterialTheme.colorScheme.secondary)
-                }
-            }
-
-            ScanPayMode.Contacts -> {
-                Text("Pay from Contacts", fontWeight = FontWeight.SemiBold)
-                Spacer(Modifier.height(6.dp))
-                val contactScroll = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
+                ScanPayMode.Contacts -> {
+                    Text("Pay from Contacts", fontWeight = FontWeight.SemiBold)
+                    val contactScroll = rememberScrollState()
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .verticalScroll(contactScroll)
-                            .padding(bottom = 6.dp),
+                            .height(180.dp)
+                            .verticalScroll(contactScroll),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         contacts.forEach { contact ->
@@ -257,161 +261,139 @@ fun ScanPayScreen(
                         }
                     }
                 }
-            }
 
-            ScanPayMode.Account -> {
-                OutlinedTextField(
-                    value = accountNumber,
-                    onValueChange = { accountNumber = it.filter(Char::isDigit) },
-                    label = { Text("Recipient Account Number") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(Modifier.height(6.dp))
-                OutlinedTextField(
-                    value = ifsc,
-                    onValueChange = { ifsc = it.uppercase() },
-                    label = { Text("IFSC Code") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+                ScanPayMode.Account -> {
+                    OutlinedTextField(
+                        value = accountNumber,
+                        onValueChange = { accountNumber = it.filter(Char::isDigit) },
+                        label = { Text("Recipient Account Number") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = ifsc,
+                        onValueChange = { ifsc = it.uppercase() },
+                        label = { Text("IFSC Code") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
-            ScanPayMode.Self -> {
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
-                    Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
-                        Text("Self Transfer", fontWeight = FontWeight.SemiBold)
-                        Text("Move money from Bank/Card to Wallet", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                ScanPayMode.Self -> {
+                    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                        Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
+                            Text("Self Transfer", fontWeight = FontWeight.SemiBold)
+                            Text("Move money from Bank/Card to Wallet", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(Modifier.height(10.dp))
-        OutlinedTextField(
-            value = amountText,
-            onValueChange = { amountText = it.filter { c -> c.isDigit() || c == '.' } },
-            label = { Text("Amount") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(6.dp))
-        OutlinedTextField(
-            value = note,
-            onValueChange = { note = it },
-            label = { Text("Note / Description") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(Modifier.height(6.dp))
-        OutlinedTextField(
-            value = category,
-            onValueChange = { category = it },
-            label = { Text("Category (Transport, Salary, Beauty, Books, Shopping, Eats...)") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(8.dp))
-        Text("Pay Using", fontWeight = FontWeight.SemiBold)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            SourceChoice(
-                title = "Bank",
-                icon = Icons.Default.AccountBalance,
-                selected = sourceType == "bank",
-                onSelect = { sourceType = "bank" },
-                modifier = Modifier.weight(1f)
+            OutlinedTextField(
+                value = amountText,
+                onValueChange = { amountText = it.filter { c -> c.isDigit() || c == '.' } },
+                label = { Text("Amount") },
+                modifier = Modifier.fillMaxWidth()
             )
-            SourceChoice(
-                title = "Card",
-                icon = Icons.Default.Contactless,
-                selected = sourceType == "card",
-                onSelect = { sourceType = "card" },
-                modifier = Modifier.weight(1f)
+            OutlinedTextField(
+                value = note,
+                onValueChange = { note = it },
+                label = { Text("Note / Description") },
+                modifier = Modifier.fillMaxWidth()
             )
-            SourceChoice(
-                title = "Wallet",
-                icon = Icons.Default.Savings,
-                selected = sourceType == "wallet",
-                onSelect = { sourceType = "wallet" },
-                modifier = Modifier.weight(1f)
+            OutlinedTextField(
+                value = category,
+                onValueChange = { category = it },
+                label = { Text("Category (Transport, Salary, Beauty, Books, Shopping, Eats...)") },
+                modifier = Modifier.fillMaxWidth()
             )
-        }
 
-        Spacer(Modifier.height(6.dp))
-        val sourceOptions = when (sourceType) {
-            "bank" -> accounts.filter { !it.accountType.equals("Wallet", true) }
-                .map { it.accountId to "${it.bankName} ${it.accountNumber}" }
-
-            "card" -> cards.map { it.cardId to "${it.issuer} ****${it.cardNumber} (${it.cardType})" }
-            else -> listOfNotNull(wallet?.let { it.accountId to "${it.bankName} ${it.accountNumber}" })
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            sourceOptions.take(3).forEach { pair ->
-                Card(
-                    onClick = { sourceId = pair.first },
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (sourceId == pair.first) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    Text(pair.second, modifier = Modifier.padding(8.dp), fontSize = 11.sp)
-                }
-            }
-            if (sourceOptions.isEmpty()) {
-                Text(
-                    text = "No source available",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
+            Text("Pay Using", fontWeight = FontWeight.SemiBold)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                SourceChoice(
+                    title = "Bank",
+                    icon = Icons.Default.AccountBalance,
+                    selected = sourceType == "bank",
+                    onSelect = { sourceType = "bank" },
+                    modifier = Modifier.weight(1f)
+                )
+                SourceChoice(
+                    title = "Card",
+                    icon = Icons.Default.Contactless,
+                    selected = sourceType == "card",
+                    onSelect = { sourceType = "card" },
+                    modifier = Modifier.weight(1f)
+                )
+                SourceChoice(
+                    title = "Wallet",
+                    icon = Icons.Default.Savings,
+                    selected = sourceType == "wallet",
+                    onSelect = { sourceType = "wallet" },
+                    modifier = Modifier.weight(1f)
                 )
             }
-        }
 
-        Spacer(Modifier.height(4.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = walletLimitInput,
-                onValueChange = { walletLimitInput = it.filter { c -> c.isDigit() || c == '.' } },
-                label = { Text("Wallet no-PIN limit") },
-                modifier = Modifier.weight(1f)
-            )
-            UdhaarPayButton(
-                text = "Set Limit",
-                onClick = {
-                    walletLimitInput.toDoubleOrNull()?.let { upiPaymentViewModel.setWalletPinFreeLimit(it) }
-                },
-                modifier = Modifier.padding(top = 4.dp)
-            )
-        }
+            val sourceOptions = when (sourceType) {
+                "bank" -> accounts.filter { !it.accountType.equals("Wallet", true) }
+                    .map { it.accountId to "${it.bankName} ${it.accountNumber}" }
 
-        Spacer(Modifier.height(8.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-            UdhaarPayButton(
-                text = if (selectedMode == ScanPayMode.Self) "Transfer to Self Wallet" else "Pay Now",
-                onClick = {
-                    val amountValue = amountText.toDoubleOrNull() ?: 0.0
-                    if (amountValue <= 0.0) return@UdhaarPayButton
-                    val walletNoPinLimit = currentUser?.walletPinFreeLimit ?: 200.0
+                "card" -> cards.map { it.cardId to "${it.issuer} ****${it.cardNumber} (${it.cardType})" }
+                else -> listOfNotNull(wallet?.let { it.accountId to "${it.bankName} ${it.accountNumber}" })
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                sourceOptions.take(3).forEach { pair ->
+                    Card(
+                        onClick = { sourceId = pair.first },
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (sourceId == pair.first) MaterialTheme.colorScheme.primaryContainer
+                            else MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Text(pair.second, modifier = Modifier.padding(8.dp), fontSize = 11.sp)
+                    }
+                }
+                if (sourceOptions.isEmpty()) {
+                    Text(
+                        text = "No source available",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 12.sp
+                    )
+                }
+            }
 
-                    val action: () -> Unit = {
-                        when (selectedMode) {
-                            ScanPayMode.Scan -> {
-                                upiPaymentViewModel.payToUpi(
-                                    recipientUpi = scannedResult.orEmpty(),
-                                    amount = amountValue,
-                                    sourceType = sourceType,
-                                    sourceId = sourceId,
-                                    category = category,
-                                    note = note,
-                                    enteredPin = enteredPin
-                                )
-                            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = walletLimitInput,
+                    onValueChange = { walletLimitInput = it.filter { c -> c.isDigit() || c == '.' } },
+                    label = { Text("Wallet no-PIN limit") },
+                    modifier = Modifier.weight(1f)
+                )
+                UdhaarPayButton(
+                    text = "Set Limit",
+                    onClick = {
+                        walletLimitInput.toDoubleOrNull()?.let { upiPaymentViewModel.setWalletPinFreeLimit(it) }
+                    },
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
-                            ScanPayMode.Contacts -> {
-                                selectedContact?.let {
-                                    upiPaymentViewModel.payFromContact(
-                                        contact = it,
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                UdhaarPayButton(
+                    text = if (selectedMode == ScanPayMode.Self) "Transfer to Self Wallet" else "Pay Now",
+                    onClick = {
+                        val amountValue = amountText.toDoubleOrNull() ?: 0.0
+                        if (amountValue <= 0.0) return@UdhaarPayButton
+                        val walletNoPinLimit = currentUser?.walletPinFreeLimit ?: 200.0
+
+                        val action: () -> Unit = {
+                            when (selectedMode) {
+                                ScanPayMode.Scan -> {
+                                    upiPaymentViewModel.payToUpi(
+                                        recipientUpi = parsedQr?.upiId ?: scannedResult.orEmpty(),
                                         amount = amountValue,
                                         sourceType = sourceType,
                                         sourceId = sourceId,
@@ -420,59 +402,72 @@ fun ScanPayScreen(
                                         enteredPin = enteredPin
                                     )
                                 }
-                            }
 
-                            ScanPayMode.Account -> {
-                                upiPaymentViewModel.payToAccountNumber(
-                                    accountNumber = accountNumber,
-                                    ifsc = ifsc,
-                                    amount = amountValue,
-                                    sourceType = sourceType,
-                                    sourceId = sourceId,
-                                    category = category,
-                                    note = note,
-                                    enteredPin = enteredPin
-                                )
-                            }
+                                ScanPayMode.Contacts -> {
+                                    selectedContact?.let {
+                                        upiPaymentViewModel.payFromContact(
+                                            contact = it,
+                                            amount = amountValue,
+                                            sourceType = sourceType,
+                                            sourceId = sourceId,
+                                            category = category,
+                                            note = note,
+                                            enteredPin = enteredPin
+                                        )
+                                    }
+                                }
 
-                            ScanPayMode.Self -> {
-                                upiPaymentViewModel.transferToSelfWallet(
-                                    amount = amountValue,
-                                    sourceType = sourceType,
-                                    sourceId = sourceId,
-                                    note = note,
-                                    enteredPin = enteredPin
-                                )
+                                ScanPayMode.Account -> {
+                                    upiPaymentViewModel.payToAccountNumber(
+                                        accountNumber = accountNumber,
+                                        ifsc = ifsc,
+                                        amount = amountValue,
+                                        sourceType = sourceType,
+                                        sourceId = sourceId,
+                                        category = category,
+                                        note = note,
+                                        enteredPin = enteredPin
+                                    )
+                                }
+
+                                ScanPayMode.Self -> {
+                                    upiPaymentViewModel.transferToSelfWallet(
+                                        amount = amountValue,
+                                        sourceType = sourceType,
+                                        sourceId = sourceId,
+                                        note = note,
+                                        enteredPin = enteredPin
+                                    )
+                                }
                             }
+                            Unit
                         }
-                        Unit
-                    }
-                    pendingAction = action
-                    val needsPin = when (sourceType) {
-                        "wallet" -> amountValue > walletNoPinLimit
-                        else -> true
-                    }
-                    if (needsPin) {
-                        showPinDialog = true
-                    } else {
-                        enteredPin = ""
-                        pendingAction?.invoke()
-                        pendingAction = null
-                    }
-                },
-                modifier = Modifier.weight(1f)
-            )
-            UdhaarPayButton(
-                text = "NFC",
-                onClick = { showNfcDialog = true },
-                modifier = Modifier.width(96.dp)
-            )
-        }
+                        pendingAction = action
+                        val needsPin = when (sourceType) {
+                            "wallet" -> amountValue > walletNoPinLimit
+                            else -> true
+                        }
+                        if (needsPin) {
+                            showPinDialog = true
+                        } else {
+                            enteredPin = ""
+                            pendingAction?.invoke()
+                            pendingAction = null
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+                UdhaarPayButton(
+                    text = "NFC",
+                    onClick = { showNfcDialog = true },
+                    modifier = Modifier.width(96.dp)
+                )
+            }
 
-        if (!statusMessage.isNullOrBlank()) {
-            Spacer(Modifier.height(8.dp))
-            Text(statusMessage ?: "", color = MaterialTheme.colorScheme.primary)
-            UdhaarPayTextButton(text = "Dismiss", onClick = { upiPaymentViewModel.clearStatus() })
+            if (!statusMessage.isNullOrBlank()) {
+                Text(statusMessage ?: "", color = MaterialTheme.colorScheme.primary)
+                UdhaarPayTextButton(text = "Dismiss", onClick = { upiPaymentViewModel.clearStatus() })
+            }
         }
     }
 
@@ -663,10 +658,48 @@ private fun MessageContactsDialog(
                 }
             }
         },
-        confirmButton = {
+    confirmButton = {
             TextButton(onClick = onDismiss) { Text("Close") }
         }
     )
+}
+
+@Composable
+private fun ParsedQrCard(qr: ParsedQrPayment) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                if (qr.isMerchant) "Merchant QR detected" else "Personal UPI QR detected",
+                fontWeight = FontWeight.SemiBold
+            )
+            Text("Payee: ${qr.payeeName ?: qr.upiId ?: "Unknown"}")
+            Text("UPI: ${qr.upiId ?: qr.raw}")
+            Text("Category: ${qr.merchantCategory}")
+            if (qr.merchantCode != null) {
+                Text("Merchant Code: ${qr.merchantCode}")
+            }
+            if (qr.amount != null) {
+                Text("Suggested Amount: INR ${"%.2f".format(qr.amount)}")
+            }
+            if (!qr.note.isNullOrBlank()) {
+                Text("Note: ${qr.note}")
+            }
+            Text(
+                if (qr.isMerchant) {
+                    "Use a RuPay card, wallet, or bank account."
+                } else {
+                    "Use wallet or bank for a person-to-person payment."
+                },
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp
+            )
+        }
+    }
 }
 
 fun decodeQrFromBitmap(bitmap: Bitmap?): String {

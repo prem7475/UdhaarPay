@@ -4,8 +4,10 @@ sealed class AppRoute(val route: String) {
     data object Home : AppRoute("home")
     data object Payments : AppRoute("payments")
     data object Tickets : AppRoute("tickets")
+    data object Bookings : AppRoute("bookings")
     data object Invest : AppRoute("invest")
     data object InvestNews : AppRoute("invest_news")
+    data object Insights : AppRoute("insights")
     data object Account : AppRoute("account")
 
     data object ScanPay : AppRoute("scan_pay")
@@ -25,6 +27,7 @@ sealed class AppRoute(val route: String) {
     data object SendMoney : AppRoute("send_money")
     data object RequestMoney : AppRoute("request_money")
     data object LinkUpi : AppRoute("link_upi")
+    data object Security : AppRoute("security")
     data object Passbook : AppRoute("passbook/{accountId}")
 
     companion object {

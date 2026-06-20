@@ -33,7 +33,7 @@ import com.udhaarpay.app.data.local.dao.PaperTradingDao
 		PaperTradingAccount::class,
 		Trade::class
 	],
-	version = 7,
+	version = 8,
 	exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
